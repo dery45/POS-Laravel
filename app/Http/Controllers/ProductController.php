@@ -8,6 +8,9 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+
+
 
 class ProductController extends Controller
 {
@@ -141,4 +144,51 @@ class ProductController extends Controller
             'success' => true
         ]);
     }
+    
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'csvFile' => 'required|mimes:csv,txt',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator);
+        }
+
+        $file = $request->file('csvFile');
+        $filePath = $file->getPathname();
+
+        // Parse the CSV file and import the products
+        if (($handle = fopen($filePath, 'r')) !== false) {
+            // Skip the header row
+            $header = fgetcsv($handle);
+
+            while (($data = fgetcsv($handle)) !== false) {
+                // Process each row of data
+                $name = $data[0];
+                $barcode = $data[1];
+                $price = $data[2];
+                $quantity = $data[3];
+
+                // Create a new product using the parsed data
+                $product = new Product();
+                $product->name = $name;
+                $product->barcode = $barcode;
+                $product->price = $price;
+                $product->quantity = $quantity;
+                // Set other fields if needed
+
+                // Save the product
+                $product->save();
+            }
+
+            fclose($handle);
+        }
+
+        return redirect()->route('products.index')->with('success', 'CSV import successful.');
+    }
+
+
+
 }
