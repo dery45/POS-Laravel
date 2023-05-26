@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+# from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from sqlalchemy import text
 import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost:3306/pos_suge'
 app.config['JWT_SECRET_KEY'] = 'suge-key'
-jwt = JWTManager(app)
+# jwt = JWTManager(app)
 api = Api(app)
 db = SQLAlchemy(app)
 CORS(app)
@@ -178,8 +178,41 @@ class DeleteUserResource(Resource):
         else:
             return jsonify({'error': 'User not found'}), 404
 
+# Endpoint to retrive all users
+class GetAllUsersResource(Resource):
+    def get(self):
+        # Retrieve all users and their corresponding roles from the database
+        users = db.session.query(User, Role).join(Role).all()
+
+        # Prepare the response data
+        data = []
+        for user, role in users:
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'name': user.name,
+                'address': user.address,
+                'phone_number': user.phone_number,
+                'email': user.email,
+                'role': {
+                    'id': role.role_id,
+                    'name': role.name,
+                    'access': role.access
+                }
+            }
+            data.append(user_data)
+
+        # Return the response with the data
+        response = app.response_class(
+            response=json.dumps(data),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
 # Add the resources to the API
 api.add_resource(CreateUserResource, '/users')
+api.add_resource(GetAllUsersResource, '/allusers')
 api.add_resource(GetUserResource, '/users/<int:user_id>')
 api.add_resource(UpdateUserResource, '/users/<int:user_id>')
 api.add_resource(DeleteUserResource, '/users/<int:user_id>')
