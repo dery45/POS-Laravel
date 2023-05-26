@@ -10,7 +10,7 @@
             <div class="small-box bg-info">
               <div class="inner">
                   <h3>{{$orders_count}}</h3>
-                <p>Orders Count</p>
+                <p>Total Order</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
@@ -24,7 +24,7 @@
             <div class="small-box bg-success">
               <div class="inner">
                   <h3>{{config('settings.currency_symbol')}} {{number_format($income, 2)}}</h3>
-                <p>Income</p>
+                <p>Pendapatan</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
@@ -39,7 +39,7 @@
               <div class="inner">
                 <h3>{{config('settings.currency_symbol')}} {{number_format($income_today, 2)}}</h3>
 
-                <p>Income Today</p>
+                <p>Pendapatan hari ini</p>
               </div>
               <div class="icon">
                 <i class="ion ion-pie-graph"></i>
@@ -54,7 +54,7 @@
               <div class="inner">
                 <h3>{{$customers_count}}</h3>
 
-                <p>Customers Count</p>
+                <p>Total Pelanggan</p>
               </div>
               <div class="icon">
                 <i class="ion ion-person-add"></i>
