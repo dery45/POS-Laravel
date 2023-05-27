@@ -29,8 +29,8 @@
                 @hasanyrole('superadmin|admin|inventory')
                 <li class="nav-item">
                     <a href="{{ route('categories.index') }}" class="nav-link {{ activeSegment('categories') }}">
-                        <i class="nav-icon fas fa-th-large"></i>
-                        <p>Produk</p>
+                        <i class="nav-icon fas  fa-suitcase"></i>
+                        <p>Kategori</p>
                     </a>
                 </li>
                 @endhasanyrole

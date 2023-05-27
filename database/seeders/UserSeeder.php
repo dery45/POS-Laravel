@@ -37,6 +37,17 @@ class UserSeeder extends Seeder
 
         $superadmin -> assignRole('superadmin');
 
+        $inventory = User::updateOrCreate([
+            'email' => 'inventory@gmail.com'
+        ], [
+            'first_name' => 'Inventory',
+            'last_name' => 'Inventory',
+            'email'=>'inventory@gmail.com',
+            'password' => bcrypt('admin123')
+        ]);
+
+        $inventory -> assignRole('inventory');
+
         $cashier = User::updateOrCreate([
             'email' => 'cashier@gmail.com'
         ], [
