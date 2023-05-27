@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasRoles;
     use Notifiable;
 
     /**
@@ -40,6 +42,11 @@ class User extends Authenticatable
     public function cart()
     {
         return $this->belongsToMany(Product::class, 'user_cart')->withPivot('quantity');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 
     public function getFullname()

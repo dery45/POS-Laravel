@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::updateOrCreate([
+        $admin = User::updateOrCreate([
             'email' => 'admin@gmail.com'
         ], [
             'first_name' => 'Admin',
@@ -22,5 +23,30 @@ class UserSeeder extends Seeder
             'email'=>'admin@gmail.com',
             'password' => bcrypt('admin123')
         ]);
+
+        $admin -> assignRole('admin');
+
+        $superadmin = User::updateOrCreate([
+            'email' => 'superadmin@gmail.com'
+        ], [
+            'first_name' => 'superAdmin',
+            'last_name' => 'superadmin',
+            'email'=>'superadmin@gmail.com',
+            'password' => bcrypt('admin123')
+        ]);
+
+        $superadmin -> assignRole('superadmin');
+
+        $cashier = User::updateOrCreate([
+            'email' => 'cashier@gmail.com'
+        ], [
+            'first_name' => 'cashier',
+            'last_name' => 'cashier',
+            'email'=>'cashier@gmail.com',
+            'password' => bcrypt('admin123')
+        ]);
+
+        $cashier -> assignRole('cashier');
+
     }
 }
