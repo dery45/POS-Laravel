@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2023 at 10:25 AM
+-- Generation Time: May 28, 2023 at 10:37 AM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.1.10
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `pos_suge`
 --
+CREATE DATABASE IF NOT EXISTS `pos_suge` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `pos_suge`;
 
 -- --------------------------------------------------------
 
