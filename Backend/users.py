@@ -7,6 +7,7 @@ from sqlalchemy import text
 import json
 
 app = Flask(__name__)
+app.run(port=5555)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost:3306/pos_suge'
 app.config['JWT_SECRET_KEY'] = 'suge-key'
 # jwt = JWTManager(app)
