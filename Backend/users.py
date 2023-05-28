@@ -87,10 +87,6 @@ class CreateUserResource(Resource):
         # Handle the uniqueness constraint violation error
             return jsonify({'message': 'Username already taken'})
 
-        
-
-        
-
 # Endpoint to get user details by ID
 class GetUserResource(Resource):
     def get(self, user_id):
