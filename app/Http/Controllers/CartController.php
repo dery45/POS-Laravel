@@ -3,18 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\DailyCapital;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
     public function index(Request $request)
     {
+        $orders = Order::with(['items', 'payments'])->get();
+
+        $today = Carbon::today();
+        $dailyCapital = DailyCapital::whereDate('created_at', $today)->first();
+
+        $capitalValue = $dailyCapital ? $dailyCapital->capital : 0;
+
+        $cashin=0;
+        $cashlessin=0;
+
         if ($request->wantsJson()) {
             return response(
                 $request->user()->cart()->get()
             );
         }
-        return view('cart.index');
+        return view('cart.index',[
+            'pendapatan' => $orders->where('created_at', '>=', date('Y-m-d').' 00:00:00')->map(function($i) {
+            if($i->receivedAmount() > $i->total()) {
+                return $i->total();
+            }
+            return $i->receivedAmount();
+            })->sum(),
+            'capitalValue' => $capitalValue,
+            'cashIn'=>$cashin,
+            'cashlessIn'=>$cashlessin,
+        ]);
     }
 
     public function store(Request $request)
@@ -89,5 +112,25 @@ class CartController extends Controller
         $request->user()->cart()->detach();
 
         return response('', 204);
+    }
+    public function modal(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'capital' => 'required|numeric'
+        ]);
+
+        // Simpan data ke tabel daily_capital
+        $dailyCapital = DailyCapital::create([
+            'capital'=>$request->capital,
+            'user_id'=>$request->user()->id
+        ]);
+
+        // Tambahkan logika atau tindakan lain yang diperlukan setelah menyimpan data
+
+        if (!$dailyCapital) {
+            return redirect()->back()->with('error', 'Gagal input modal harian');
+        }
+        return redirect()->back()->with('success', 'Data modal harian berhasil disimpan.');
     }
 }

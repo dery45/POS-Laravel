@@ -21,6 +21,7 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
+    Route::post('/cart/capital',[CartController::class, 'modal'])->name('cart.capital');
     Route::delete('/cart/delete', [CartController::class, 'delete']);
     Route::delete('/cart/empty', [CartController::class, 'empty']);
     Route::resource('orders', OrderController::class)->only(['index', 'show']);
