@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2023 at 06:20 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.1.17
+-- Generation Time: May 28, 2023 at 10:19 AM
+-- Server version: 10.4.25-MariaDB
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `cart` (
   `fk_user_id` int(11) NOT NULL,
   `fk_product_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -45,7 +45,16 @@ CREATE TABLE `categories` (
   `name` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`cat_id`, `name`, `created_at`, `updated_at`) VALUES
+(2, 'Cat 5 Upadted', '2023-05-28 07:32:41', '2023-05-28 07:32:41'),
+(3, 'Update Categories', '2023-05-28 07:43:25', '2023-05-28 07:43:25'),
+(7, 'New Categories', '2023-05-28 08:01:36', NULL);
 
 -- --------------------------------------------------------
 
@@ -57,7 +66,7 @@ CREATE TABLE `daily_capital` (
   `id` int(11) NOT NULL,
   `capital` decimal(10,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -69,7 +78,7 @@ CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
   `fk_user_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -82,7 +91,7 @@ CREATE TABLE `order_detail` (
   `fk_product_id` int(11) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `quantity` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -98,7 +107,7 @@ CREATE TABLE `payments` (
   `amount` decimal(10,2) NOT NULL,
   `evidence` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -113,7 +122,7 @@ CREATE TABLE `price_history` (
   `stock_price` decimal(10,2) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `fk_product_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -136,7 +145,7 @@ CREATE TABLE `products` (
   `normal_price` decimal(10,2) DEFAULT NULL,
   `low_price` decimal(10,2) DEFAULT NULL,
   `stock_price` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -148,7 +157,17 @@ CREATE TABLE `roles` (
   `role_id` tinyint(4) NOT NULL,
   `name` varchar(255) NOT NULL,
   `access` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`role_id`, `name`, `access`) VALUES
+(1, 'Admin', 'full'),
+(2, 'Manager', 'limited'),
+(3, 'Employee', 'basic'),
+(4, 'Guest', 'read-only');
 
 -- --------------------------------------------------------
 
@@ -161,7 +180,7 @@ CREATE TABLE `stock_history` (
   `stock` int(11) DEFAULT NULL,
   `fk_product_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -180,7 +199,14 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `edited_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `username`, `address`, `phone_number`, `fk_role_id`, `password`, `email`, `created_at`, `edited_at`) VALUES
+(1, 'delete', 'delete', 'Hlgn Main St', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 13:03:34', NULL);
 
 --
 -- Indexes for dumped tables
@@ -274,6 +300,12 @@ ALTER TABLE `cart`
   MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `cat_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `daily_capital`
 --
 ALTER TABLE `daily_capital`
@@ -301,13 +333,13 @@ ALTER TABLE `price_history`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `role_id` tinyint(4) NOT NULL AUTO_INCREMENT;
+  MODIFY `role_id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -346,12 +378,6 @@ ALTER TABLE `payments`
 ALTER TABLE `price_history`
   ADD CONSTRAINT `fk_prices_product` FOREIGN KEY (`fk_product_id`) REFERENCES `products` (`product_id`),
   ADD CONSTRAINT `price_history_ibfk_1` FOREIGN KEY (`fk_product_id`) REFERENCES `products` (`product_id`);
-
---
--- Constraints for table `products`
---
-ALTER TABLE `products`
-  ADD CONSTRAINT `fk_category` FOREIGN KEY (`fk_cat_id`) REFERENCES `categories` (`cat_id`);
 
 --
 -- Constraints for table `stock_history`
