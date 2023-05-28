@@ -220,4 +220,4 @@ api.add_resource(UpdateUserResource, '/users/<int:user_id>')
 api.add_resource(DeleteUserResource, '/users/<int:user_id>')
 
 if __name__ == '__main__':
-    app.run(port=5555)
+    app.run()
