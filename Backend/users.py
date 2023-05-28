@@ -92,8 +92,10 @@ class GetUserResource(Resource):
             data = {
                 'id': user_obj.id,
                 'name': user_obj.name,
+                'username':user_obj.username,
                 'address': user_obj.address,
                 'phone_number': user_obj.phone_number,
+                'email':user_obj.email,
                 'role': {
                     'id': role_obj.role_id,
                     'name': role_obj.name,
