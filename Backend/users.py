@@ -7,7 +7,6 @@ from sqlalchemy import text
 import json
 
 app = Flask(__name__)
-app.run(port=5555)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost:3306/pos_suge'
 app.config['JWT_SECRET_KEY'] = 'suge-key'
 # jwt = JWTManager(app)
@@ -221,4 +220,4 @@ api.add_resource(UpdateUserResource, '/users/<int:user_id>')
 api.add_resource(DeleteUserResource, '/users/<int:user_id>')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5555)
