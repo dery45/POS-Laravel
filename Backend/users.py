@@ -178,7 +178,7 @@ class DeleteUserResource(Resource):
 
             return jsonify({'message': 'User deleted successfully'})
         else:
-            return jsonify({'error': 'User not found'}), 404
+            return jsonify({'message': 'User not found'})
 
 # Endpoint to retrive all users
 class GetAllUsersResource(Resource):

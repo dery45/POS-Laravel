@@ -124,7 +124,7 @@ class DeleteCategoryResource(Resource):
             return jsonify({'message': 'Category deleted successfully'})
         
         else:
-            return jsonify({'error': 'Category not found'}), 404
+            return jsonify({'message': 'Category not found'})
 
 api = Api(app)
 api.add_resource(GetAllCategoryResource, '/categories')
