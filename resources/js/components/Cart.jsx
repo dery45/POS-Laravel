@@ -37,7 +37,7 @@ class Cart extends Component {
     }
 
     loadCustomers() {
-        axios.get(`/admin/customers`).then((res) => {
+        axios.get(`/customers`).then((res) => {
             const customers = res.data;
             this.setState({ customers });
         });
@@ -45,7 +45,7 @@ class Cart extends Component {
 
     loadProducts(search = "") {
         const query = !!search ? `?search=${search}` : "";
-        axios.get(`/admin/products${query}`).then((res) => {
+        axios.get(`/products${query}`).then((res) => {
             const products = res.data.data;
             this.setState({ products });
         });
@@ -58,7 +58,7 @@ class Cart extends Component {
     }
 
     loadCart() {
-        axios.get("/admin/cart").then((res) => {
+        axios.get("/cart").then((res) => {
             const cart = res.data;
             this.setState({ cart });
         });
@@ -69,7 +69,7 @@ class Cart extends Component {
         const { barcode } = this.state;
         if (!!barcode) {
             axios
-                .post("/admin/cart", { barcode })
+                .post("/cart", { barcode })
                 .then((res) => {
                     this.loadCart();
                     this.setState({ barcode: "" });
@@ -91,7 +91,7 @@ class Cart extends Component {
         if (!qty) return;
 
         axios
-            .post("/admin/cart/change-qty", { product_id, quantity: qty })
+            .post("/cart/change-qty", { product_id, quantity: qty })
             .then((res) => {})
             .catch((err) => {
                 Swal.fire("Error!", err.response.data.message, "error");
@@ -104,14 +104,14 @@ class Cart extends Component {
     }
     handleClickDelete(product_id) {
         axios
-            .post("/admin/cart/delete", { product_id, _method: "DELETE" })
+            .post("/cart/delete", { product_id, _method: "DELETE" })
             .then((res) => {
                 const cart = this.state.cart.filter((c) => c.id !== product_id);
                 this.setState({ cart });
             });
     }
     handleEmptyCart() {
-        axios.post("/admin/cart/empty", { _method: "DELETE" }).then((res) => {
+        axios.post("/cart/empty", { _method: "DELETE" }).then((res) => {
             this.setState({ cart: [] });
         });
     }
@@ -128,19 +128,14 @@ class Cart extends Component {
     addProductToCart(barcode) {
         let product = this.state.products.find((p) => p.barcode === barcode);
         if (!!product) {
-            // Jika produk sudah ada dalam keranjang
             let cart = this.state.cart.find((c) => c.id === product.id);
             if (!!cart) {
-                // Perbarui kuantitas
                 this.setState({
                     cart: this.state.cart.map((c) => {
                         if (c.id === product.id && product.quantity > c.pivot.quantity) {
-                            // Cek jika kuantitas memenuhi persyaratan grosir
                             if (c.pivot.quantity >= 50) {
-                                // Harga grosir
                                 c.price = product.wholesale_price;
                             } else {
-                                // Harga biasa
                                 c.price = product.price;
                             }
                             c.pivot.quantity = c.pivot.quantity + 1;
@@ -150,7 +145,6 @@ class Cart extends Component {
                 });
             } else {
                 if (product.quantity > 0) {
-                    // Cek jika kuantitas memenuhi persyaratan grosir
                     const price = product.quantity >= 50 ? product.wholesale_price : product.price;
     
                     product = {
@@ -168,7 +162,7 @@ class Cart extends Component {
             }
     
             axios
-                .post("/admin/cart", { barcode })
+                .post("/cart", { barcode })
                 .then((res) => {
                     // this.loadCart();
                     console.log(res);
@@ -193,7 +187,7 @@ class Cart extends Component {
             showLoaderOnConfirm: true,
             preConfirm: (amount) => {
                 return axios
-                    .post("/admin/orders", {
+                    .post("/orders", {
                         customer_id: this.state.customer_id,
                         amount,
                     })
