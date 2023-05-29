@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2023 at 08:24 PM
--- Server version: 10.4.25-MariaDB
--- PHP Version: 8.1.10
+-- Generation Time: May 29, 2023 at 10:03 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.1.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `cart` (
   `fk_user_id` int(11) NOT NULL,
   `fk_product_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -45,16 +45,16 @@ CREATE TABLE `categories` (
   `name` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
 INSERT INTO `categories` (`cat_id`, `name`, `created_at`, `updated_at`) VALUES
-(2, 'Cat 5 Upadted', '2023-05-28 07:32:41', '2023-05-28 07:32:41'),
 (3, 'Update Categories', '2023-05-28 07:43:25', '2023-05-28 07:43:25'),
-(7, 'New Categories', '2023-05-28 08:01:36', NULL);
+(7, 'New Categories', '2023-05-28 08:01:36', NULL),
+(8, 'New Categories', '2023-05-29 19:38:34', NULL);
 
 -- --------------------------------------------------------
 
@@ -66,7 +66,7 @@ CREATE TABLE `daily_capital` (
   `id` int(11) NOT NULL,
   `capital` decimal(10,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -78,7 +78,7 @@ CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
   `fk_user_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -87,11 +87,12 @@ CREATE TABLE `orders` (
 --
 
 CREATE TABLE `order_detail` (
+  `id` int(11) NOT NULL,
   `fk_order_id` int(11) NOT NULL,
   `fk_product_id` int(11) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `quantity` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -107,7 +108,7 @@ CREATE TABLE `payments` (
   `amount` decimal(10,2) NOT NULL,
   `evidence` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -122,7 +123,23 @@ CREATE TABLE `price_history` (
   `stock_price` decimal(10,2) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `fk_product_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `price_history`
+--
+
+INSERT INTO `price_history` (`price_id`, `normal_price`, `low_price`, `stock_price`, `created_at`, `fk_product_id`) VALUES
+(1, 24.99, 14.99, 9.99, '2023-05-29 18:22:34', 8),
+(2, 24.99, 14.99, 9.99, '2023-05-29 19:37:13', 9),
+(3, 11000.00, 9500.00, 7000.00, '2023-05-29 19:37:42', 4),
+(4, 24.99, 14.99, 9.99, '2023-05-29 19:42:47', 10),
+(5, 24.99, 14.99, 9.99, '2023-05-29 19:42:58', 11),
+(6, 24.99, 14.99, 9.99, '2023-05-29 19:44:05', 12),
+(7, 24.99, 14.99, 9.99, '2023-05-29 19:45:44', 13),
+(8, 24.99, 14.99, 9.99, '2023-05-29 19:47:23', 14),
+(9, 11000.00, 9500.00, 7000.00, '2023-05-29 19:50:29', 4),
+(10, 24.99, 14.99, 9.99, '2023-05-29 19:55:19', 15);
 
 -- --------------------------------------------------------
 
@@ -145,18 +162,25 @@ CREATE TABLE `products` (
   `normal_price` decimal(10,2) DEFAULT NULL,
   `low_price` decimal(10,2) DEFAULT NULL,
   `stock_price` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
 INSERT INTO `products` (`product_id`, `name`, `description`, `fk_cat_id`, `image`, `status`, `minimum_low`, `brand`, `created_at`, `updated_at`, `stock`, `normal_price`, `low_price`, `stock_price`) VALUES
-(2, 'Example Product 3', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:50:11', NULL, 10, '24.99', '14.99', '9.99'),
-(4, 'Example Product 3', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:23', NULL, 10, '24.99', '14.99', '9.99'),
-(5, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:30', NULL, 10, '24.99', '14.99', '9.99'),
-(6, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:55', NULL, 10, '24.99', '14.99', '9.99'),
-(7, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:54:31', NULL, 10, '24.99', '14.99', '9.99');
+(2, 'Example Product 3', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-28 17:50:11', NULL, 10, 24.99, 14.99, 9.99),
+(4, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 50.00, 'Example Brand', '2023-05-29 18:22:39', '2023-05-29 18:22:39', 140, 11000.00, 9500.00, 7000.00),
+(5, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-28 17:51:30', NULL, 10, 24.99, 14.99, 9.99),
+(6, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-28 17:51:55', NULL, 10, 24.99, 14.99, 9.99),
+(7, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-28 17:54:31', NULL, 10, 24.99, 14.99, 9.99),
+(9, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:37:13', NULL, 10, 24.99, 14.99, 9.99),
+(10, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:42:47', NULL, 10, 24.99, 14.99, 9.99),
+(11, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:42:58', NULL, 10, 24.99, 14.99, 9.99),
+(12, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:44:05', NULL, 10, 24.99, 14.99, 9.99),
+(13, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:45:44', NULL, 10, 24.99, 14.99, 9.99),
+(14, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:47:23', NULL, 10, 24.99, 14.99, 9.99),
+(15, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', 5.00, 'Example Brand', '2023-05-29 19:55:19', NULL, 10, 24.99, 14.99, 9.99);
 
 -- --------------------------------------------------------
 
@@ -168,7 +192,7 @@ CREATE TABLE `roles` (
   `role_id` tinyint(4) NOT NULL,
   `name` varchar(255) NOT NULL,
   `access` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `roles`
@@ -191,7 +215,23 @@ CREATE TABLE `stock_history` (
   `stock` int(11) DEFAULT NULL,
   `fk_product_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `stock_history`
+--
+
+INSERT INTO `stock_history` (`id`, `stock`, `fk_product_id`, `created_at`) VALUES
+(1, 10, 8, '2023-05-29 18:22:34'),
+(2, 10, 9, '2023-05-29 19:37:13'),
+(3, 140, 4, '2023-05-29 19:37:42'),
+(4, 10, 10, '2023-05-29 19:42:47'),
+(5, 10, 11, '2023-05-29 19:42:58'),
+(6, 10, 12, '2023-05-29 19:44:05'),
+(7, 10, 13, '2023-05-29 19:45:44'),
+(8, 10, 14, '2023-05-29 19:47:23'),
+(9, 140, 4, '2023-05-29 19:50:29'),
+(10, 10, 15, '2023-05-29 19:55:19');
 
 -- --------------------------------------------------------
 
@@ -210,18 +250,18 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `edited_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `username`, `address`, `phone_number`, `fk_role_id`, `password`, `email`, `created_at`, `edited_at`) VALUES
-(1, 'John Doe Edit', 'jonhhh', '123 Main St', '1234567890', 3, 'jono', 'john@example.com', '2023-05-28 13:03:34', '2023-05-28 15:54:09'),
-(2, '1', '1', 'Hlgn Main St', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 15:48:42', NULL),
+(2, 'John Doe Edit', 'xxxxxx', '123 Main St', '1234567890', 3, 'jono', 'john@example.com', '2023-05-28 15:48:42', '2023-05-30 02:39:26'),
 (6, '1', '2', 'Hlgn Main St', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 15:56:38', NULL),
 (8, 'asdasd', 'asdasd', 'asdas', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 15:57:32', NULL),
-(10, 'asdasd', 'a', 'asdas', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 15:59:25', NULL);
+(10, 'asdasd', 'a', 'asdas', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-28 15:59:25', NULL),
+(12, 'asdasd', 'a222', 'asdas', '1234567890', 1, 'password123', 'johndoe@example.com', '2023-05-30 02:39:47', NULL);
 
 --
 -- Indexes for dumped tables
@@ -258,8 +298,7 @@ ALTER TABLE `orders`
 -- Indexes for table `order_detail`
 --
 ALTER TABLE `order_detail`
-  ADD PRIMARY KEY (`fk_order_id`,`fk_product_id`),
-  ADD KEY `fk_product_id` (`fk_product_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `payments`
@@ -318,7 +357,7 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `cat_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `cat_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `daily_capital`
@@ -333,6 +372,12 @@ ALTER TABLE `orders`
   MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `order_detail`
+--
+ALTER TABLE `order_detail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
@@ -342,13 +387,13 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `price_history`
 --
 ALTER TABLE `price_history`
-  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -357,10 +402,16 @@ ALTER TABLE `roles`
   MODIFY `role_id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `stock_history`
+--
+ALTER TABLE `stock_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
@@ -371,12 +422,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `orders`
---
-ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`fk_user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `order_detail`
