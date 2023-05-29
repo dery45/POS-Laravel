@@ -8,6 +8,7 @@ if __name__ == '__main__':
     users_app_process = run_flask_app('users:app', 5550)
     products_cat_app_process = run_flask_app('products_cat:app', 5551)
     products_app_process = run_flask_app('products:app', 5552)
+    stock_history_app_process = run_flask_app('stock_history:app', 5553)
 
     # Add any additional logic or tasks here
 

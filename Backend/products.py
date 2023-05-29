@@ -73,6 +73,18 @@ class Product(db.Model):
         self.low_price = low_price
         self.stock_price = stock_price
 
+class StockHistory(db.Model):
+    __tablename__ = 'stock_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    fk_product_id = db.Column(db.Integer, nullable=False)
+    stock = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def __init__(self, fk_product_id, stock):
+        self.fk_product_id = fk_product_id
+        self.stock = stock
+
 class ProductResource(Resource):
     def post(self):
         data = request.get_json()
@@ -107,11 +119,23 @@ class ProductResource(Resource):
             # Add the product to the database
             db.session.add(product)
             db.session.commit()
+
+            #Insert the history table
+            stock_history = StockHistory(
+                fk_product_id = product.product_id,
+                stock = product.stock
+                )
+            # Add the product to the history
+            db.session.add(stock_history)
+            db.session.commit()
+
             return {'message': 'Product created successfully', 'product_id': product.product_id}, 201
             
         except Exception as e:
             db.session.rollback()
             return {'message': 'Failed to create product', 'error': str(e)}, 500
+        
+        
 
 class GetAllProductsResource(Resource):
     def get(self):
@@ -182,7 +206,16 @@ class PutProductResource(Resource):
 
         try:
             db.session.commit()
+            #Insert the history table
+            stock_history = StockHistory(
+                fk_product_id = product.product_id,
+                stock = product.stock
+                )
+            # Add the product to the history
+            db.session.add(stock_history)
+            db.session.commit()
             return {'message': 'Product updated successfully'}, 200
+
         except Exception as e:
             db.session.rollback()
             return {'message': 'Failed to update product', 'error': str(e)}, 500
