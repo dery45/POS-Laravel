@@ -36,6 +36,7 @@ Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () 
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {
+    Route::get('/autocomplete/search', 'AutocompleteController@search')->name('autocomplete.search');
     Route::get('/admin', [HomeController::class, 'index'])->name('home');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
