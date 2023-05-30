@@ -128,16 +128,16 @@ class Cart extends Component {
     addProductToCart(barcode) {
         let product = this.state.products.find((p) => p.barcode === barcode);
         if (!!product) {
+            // if product is already in cart
             let cart = this.state.cart.find((c) => c.id === product.id);
             if (!!cart) {
+                // update quantity
                 this.setState({
                     cart: this.state.cart.map((c) => {
-                        if (c.id === product.id && product.quantity > c.pivot.quantity) {
-                            if (c.pivot.quantity >= 50) {
-                                c.price = product.wholesale_price;
-                            } else {
-                                c.price = product.price;
-                            }
+                        if (
+                            c.id === product.id &&
+                            product.quantity > c.pivot.quantity
+                        ) {
                             c.pivot.quantity = c.pivot.quantity + 1;
                         }
                         return c;
@@ -145,8 +145,6 @@ class Cart extends Component {
                 });
             } else {
                 if (product.quantity > 0) {
-                    const price = product.quantity >= 50 ? product.wholesale_price : product.price;
-    
                     product = {
                         ...product,
                         pivot: {
@@ -154,13 +152,12 @@ class Cart extends Component {
                             product_id: product.id,
                             user_id: 1,
                         },
-                        price: price,
                     };
-    
+
                     this.setState({ cart: [...this.state.cart, product] });
                 }
             }
-    
+
             axios
                 .post("/cart", { barcode })
                 .then((res) => {
