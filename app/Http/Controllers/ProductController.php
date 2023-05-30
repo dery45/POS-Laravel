@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-
-
 class ProductController extends Controller
 {
     /**
@@ -41,7 +39,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all(); // Retrieve all categories
-         return view('products.create')->with('categories', $categories);
+        return view('products.create')->with('categories', $categories);
     }
 
     /**
@@ -58,6 +56,8 @@ class ProductController extends Controller
             $image_path = $request->file('image')->store('products', 'public');
         }
 
+        $categoryProduct = $request->category_product ?: null;
+
         $product = Product::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -66,18 +66,17 @@ class ProductController extends Controller
             'price' => $request->price,
             'quantity' => $request->quantity,
             'status' => $request->status,
-            'category_product' => $request->category_product,
+            'category_product' => $categoryProduct,
             'minimum_low' => $request->minimum_low,
             'brand' => $request->brand,
             'low_price' => $request->low_price,
             'stock_price' => $request->stock_price,
         ]);
-        
 
         if (!$product) {
-            return redirect()->back()->with('error', 'Sorry, there a problem while creating product.');
+            return redirect()->back()->with('error', 'Sorry, there was a problem while creating the product.');
         }
-        return redirect()->route('products.index')->with('success', 'Success, you product have been created.');
+        return redirect()->route('products.index')->with('success', 'Success, your product has been created.');
     }
 
     /**
@@ -101,10 +100,8 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $category_products = Category::all();
-    
         return view('products.edit', compact('product', 'categories', 'category_products'));
     }
-    
 
     /**
      * Update the specified resource in storage.
@@ -121,7 +118,10 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->quantity = $request->quantity;
         $product->status = $request->status;
-        $product->category_product = $request->category_product;
+
+        $categoryProduct = $request->category_product ?: null;
+        $product->category_product = $categoryProduct;
+
         $product->minimum_low = $request->minimum_low;
         $product->brand = $request->brand;
         $product->low_price = $request->low_price;
@@ -139,9 +139,9 @@ class ProductController extends Controller
         }
 
         if (!$product->save()) {
-            return redirect()->back()->with('error', 'Sorry, there\'re a problem while updating product.');
+            return redirect()->back()->with('error', 'Sorry, there was a problem while updating the product.');
         }
-        return redirect()->route('products.index')->with('success', 'Success, your product have been updated.');
+        return redirect()->route('products.index')->with('success', 'Success, your product has been updated.');
     }
 
     /**
@@ -156,12 +156,11 @@ class ProductController extends Controller
             Storage::delete($product->image);
         }
         $product->delete();
-    
+
         return response()->json([
             'success' => true
         ]);
     }
-    
 
     public function import(Request $request)
     {
@@ -187,6 +186,12 @@ class ProductController extends Controller
                 $barcode = $data[1];
                 $price = $data[2];
                 $quantity = $data[3];
+                $description = $data[4] ?? null;
+                $categoryProduct = $data[5] ?? null;
+                $minimumLow = $data[6] ?? null;
+                $brand = $data[7] ?? null;
+                $lowPrice = $data[8] ?? null;
+                $stockPrice = $data[9] ?? null;
 
                 // Create a new product using the parsed data
                 $product = new Product();
@@ -194,7 +199,15 @@ class ProductController extends Controller
                 $product->barcode = $barcode;
                 $product->price = $price;
                 $product->quantity = $quantity;
-                // Set other fields if needed
+                $product->description = $description;
+
+                $categoryProduct = $categoryProduct ?: null;
+                $product->category_product = $categoryProduct;
+
+                $product->minimum_low = $minimumLow;
+                $product->brand = $brand;
+                $product->low_price = $lowPrice;
+                $product->stock_price = $stockPrice;
 
                 // Save the product
                 $product->save();
@@ -203,43 +216,6 @@ class ProductController extends Controller
             fclose($handle);
         }
 
-        return redirect()->route('products.index')->with('success', 'CSV import successful.');
+        return redirect()->route('products.index')->with('success', 'Success, products imported.');
     }
-    public function up()
-    {
-        Schema::table('products', function (Blueprint $table) {
-            // Add foreign key relationship with categories table
-            $table->foreign('category_product')->references('id')->on('categories')->onDelete('cascade');
-    
-            $table->decimal('minimum_low', 10, 2);
-            $table->string('brand')->nullable();
-            $table->decimal('low_price', 10, 2)->nullable();
-            $table->decimal('stock_price', 10, 2)->nullable();
-    
-            // Modify existing columns, if needed
-            $table->text('description')->nullable()->change();
-            $table->decimal('price', 10, 2)->change();
-        });
-    }
-    
-    public function down()
-    {
-        Schema::table('products', function (Blueprint $table) {
-            // Drop foreign key relationship
-            $table->dropForeign(['category_product']);
-    
-            $table->dropColumn([
-                'minimum_low',
-                'brand',
-                'low_price',
-                'stock_price',
-            ]);
-    
-            // Restore modified columns, if needed
-            $table->string('description')->nullable(false)->change();
-            $table->decimal('price', 10, 2)->change();
-        });
-    }
-
-
 }
