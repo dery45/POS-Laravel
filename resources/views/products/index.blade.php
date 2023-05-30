@@ -10,6 +10,17 @@
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
 @endsection
 @section('content')
+<!-- Add the search bar and button -->
+<div class="mb-3">
+    <form id="searchForm" action="{{ route('products.index') }}" method="GET" class="form-inline">
+        <div class="input-group">
+            <input type="text" name="search" id="searchInput" class="form-control" placeholder="Search...">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+</div>
 <div class="card product-list">
     <div class="card-body">
         <table class="table">
@@ -42,12 +53,6 @@
                     </div>
                 </div>
             </div>
-            <!-- resources/views/search/form.blade.php -->
-
-            <form action="{{ route('search') }}" method="GET">
-                <input type="text" name="keyword" placeholder="Search..." />
-                <button type="submit">Cari</button>
-            </form>
 
             <thead>
                 <tr>
@@ -94,14 +99,50 @@
         {{ $products->render() }}
     </div>
 </div>
-@yield('js')
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function () {
+         // Function to fetch search results and update the autocomplete dropdown
+         function fetchSearchResults(query, callback) {
+            $.ajax({
+                url: '{{ route("autocomplete.search") }}',
+                dataType: 'json',
+                data: {
+                    term: query
+                },
+                success: function(data) {
+                    callback(data);
+                }
+            });
+        }
+
+        // Initialize autocomplete
+        $('#searchInput').autocomplete({
+            source: function(request, response) {
+                fetchSearchResults(request.term, function(data) {
+                    response(data);
+                });
+            },
+            minLength: 2, // Minimum characters before autocomplete starts
+            select: function(event, ui) {
+                // Redirect to the selected product page
+                window.location.href = '{{ route("products.show", ["product" => ":id"]) }}'.replace(':id', ui.item.id);
+            }
+        });
+
+        // Update search results on keyup
+        $('#searchInput').on('keyup', function() {
+            var query = $(this).val();
+            fetchSearchResults(query, function(data) {
+                // Update autocomplete dropdown
+                $('#searchInput').autocomplete('option', 'source', data);
+            });
+        });
+
         $(document).on('click', '.btn-delete', function () {
             $this = $(this);
             const swalWithBootstrapButtons = Swal.mixin({

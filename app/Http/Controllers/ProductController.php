@@ -229,32 +229,36 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'csvFile' => 'required|mimes:csv,txt',
         ]);
-
+    
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator);
         }
-
+    
         $file = $request->file('csvFile');
         $filePath = $file->getPathname();
-
+    
+        // Detect the delimiter used in the CSV file
+        $handle = fopen($filePath, 'r');
+        $delimiter = $this->detectCsvDelimiter($handle);
+        fclose($handle);
+    
         // Parse the CSV file and import the products
         if (($handle = fopen($filePath, 'r')) !== false) {
             // Skip the header row
-            $header = fgetcsv($handle);
-
-            while (($data = fgetcsv($handle)) !== false) {
+            $header = fgetcsv($handle, 0, $delimiter);
+    
+            while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
                 // Process each row of data
                 $name = $data[0];
-                $barcode = $data[1];
-                $price = $data[2];
-                $quantity = $data[3];
+                $barcode = $data[1] ?? null;
+                $price = $data[2] ?? null;
+                $quantity = $data[3] ?? null;
                 $description = $data[4] ?? null;
-                $categoryProduct = $data[5] ?? null;
                 $minimumLow = $data[6] ?? null;
                 $brand = $data[7] ?? null;
                 $lowPrice = $data[8] ?? null;
                 $stockPrice = $data[9] ?? null;
-
+    
                 // Create a new product using the parsed data
                 $product = new Product();
                 $product->name = $name;
@@ -262,22 +266,34 @@ class ProductController extends Controller
                 $product->price = $price;
                 $product->quantity = $quantity;
                 $product->description = $description;
-
-                $categoryProduct = $categoryProduct ?: null;
-                $product->category_product = $categoryProduct;
-
+    
                 $product->minimum_low = $minimumLow;
                 $product->brand = $brand;
                 $product->low_price = $lowPrice;
                 $product->stock_price = $stockPrice;
-
+    
                 // Save the product
                 $product->save();
             }
-
+    
             fclose($handle);
         }
-
+    
         return redirect()->route('products.index')->with('success', 'Success, products imported.');
     }
+    
+    private function detectCsvDelimiter($handle)
+    {
+        $line = fgets($handle);
+        $delimiters = array(',', ';', '\t');
+        $count = array_fill_keys($delimiters, 0);
+    
+        foreach ($delimiters as $delimiter) {
+            $count[$delimiter] = count(str_getcsv($line, $delimiter));
+        }
+    
+        return array_search(max($count), $count);
+    }
+    
+
 }

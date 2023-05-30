@@ -35,7 +35,12 @@ Route::group(['middleware' => ['role:superadmin|admin|inventory', 'token.expired
     Route::get('/search', 'SearchController@search')->name('search');
 });
 
-Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory', 'token.expired']], function () {
+<<<<<<< HEAD
+Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {
+=======
+Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {
+    Route::get('/autocomplete/search', 'AutocompleteController@search')->name('autocomplete.search');
+>>>>>>> eddb490257db3c9c9a00805bde2182124072feaa
     Route::get('/admin', [HomeController::class, 'index'])->name('home');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
