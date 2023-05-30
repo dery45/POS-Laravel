@@ -15,8 +15,8 @@ class SettingsSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['key' => 'app_name', 'value' => 'Laravel-POS'],
-            ['key' => 'currency_symbol', 'value' => '$'],
+            ['key' => 'app_name', 'value' => 'POS-Suge Plastik'],
+            ['key' => 'currency_symbol', 'value' => 'Rp'],
         ];
 
         foreach ($data as $value) {
