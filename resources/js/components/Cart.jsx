@@ -15,6 +15,7 @@ class Cart extends Component {
             barcode: "",
             search: "",
             customer_id: "",
+            payment_method: "",
         };
 
         this.loadCart = this.loadCart.bind(this);
@@ -49,6 +50,32 @@ class Cart extends Component {
         axios.get(`/products${query}`).then((res) => {
             const products = res.data.data;
             this.setState({ products });
+        });
+    }
+
+    loadProduk(search = "") {
+        const que = !!search ? `?search=${search}` : "";
+        axios.get(`/products${que}`).then((res) => {
+            const produk = res.data.data.map((product) => {
+                return {
+                    ...product,
+                    low_price: product.low_price, // tambahkan properti low_price
+                };
+            });
+            this.setState({ produk });
+        });
+    }
+
+    loadMin(search = "") {
+        const que = !!search ? `?search=${search}` : "";
+        axios.get(`/products${que}`).then((res) => {
+            const min = res.data.data.map((product) => {
+                return {
+                    ...product,
+                    minimum_low: product.minimum_low, // tambahkan properti low_price
+                };
+            });
+            this.setState({ min });
         });
     }
 
@@ -100,14 +127,14 @@ class Cart extends Component {
     }
 
     getTotal(cart) {
-        const grosir=5000;
-        //if(c.pivot.quantity>=50){
-        //    const total = cart.map((c) => c.pivot.quantity * grosir);
-        //}
-        //else{
-            const total = cart.map((c) => c.pivot.quantity * c.price);
-        //}
-        
+        const total = cart.map((c) => {
+            if (c.pivot.quantity >= c.minimum_low) {
+                return c.pivot.quantity * c.low_price;
+            } else {
+                return c.pivot.quantity * c.price;
+            }
+        });
+    
         return sum(total).toFixed(2);
     }
     handleClickDelete(product_id) {
@@ -182,7 +209,10 @@ class Cart extends Component {
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
-    handleClickSubmit() {
+    setPaymentMethod(event) {
+        this.setState({ payment_method: event.target.value });
+    }
+    /*handleClickSubmit() {
         Swal.fire({
             title: "Received Amount",
             input: "text",
@@ -194,6 +224,48 @@ class Cart extends Component {
                 return axios
                     .post("/orders", {
                         customer_id: this.state.customer_id,
+
+                        amount,
+                    })
+                    .then((res) => {
+                        this.loadCart();
+                        return res.data;
+                    })
+                    .catch((err) => {
+                        Swal.showValidationMessage(err.response.data.message);
+                    });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+            if (result.value) {
+                //
+            }
+        });
+    }*/
+
+    handleClickSubmit() {
+        const totalAmount = this.getTotal(this.state.cart);
+        console.log("Total Amount:", totalAmount)
+        Swal.fire({
+            title: "Received Amount",
+            input: "text",
+            inputValue: this.getTotal(this.state.cart),
+            showCancelButton: true,
+            confirmButtonText: "Send",
+            showLoaderOnConfirm: true,
+            preConfirm: (amount) => {
+                return axios
+                    .post("/orders", {
+                        customer_id: this.state.customer_id,
+                        payment_method: this.state.payment_method,
+                        items: this.state.cart.map((c) => {
+                            const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
+                            return {
+                                product_id: c.id,
+                                quantity: c.pivot.quantity,
+                                amount: totalAmount,
+                            };
+                        }),
                         amount,
                     })
                     .then((res) => {
@@ -211,8 +283,10 @@ class Cart extends Component {
             }
         });
     }
+    
     render() {
         const { cart, products, customers, barcode } = this.state;
+        const totalAmount = this.getTotal(cart);
         return (
             <div className="row">
                 <div className="col-md-6 col-lg-4">
@@ -231,8 +305,9 @@ class Cart extends Component {
                         <div className="col">
                             <select
                                 className="form-control"
-                                onChange={this.setCustomerId}
+                                onChange={this.setPaymentMethod}
                             >
+                                <option value="">Select Payment Method</option>
                                 <option value="cash">Cash</option>
                                 <option value="cashless">Cashless</option>
                                 
@@ -277,10 +352,7 @@ class Cart extends Component {
                                                 </button>
                                             </td>
                                             <td className="text-right">
-                                                {window.APP.currency_symbol}{" "}
-                                                {(
-                                                    c.price * c.pivot.quantity
-                                                ).toFixed(2)}
+                                                {window.APP.currency_symbol}{totalAmount}
                                             </td>
                                         </tr>
                                     ))}

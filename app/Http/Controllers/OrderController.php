@@ -28,7 +28,7 @@ class OrderController extends Controller
         return view('orders.index', compact('orders', 'total', 'receivedAmount'));
     }
 
-    public function store(OrderStoreRequest $request)
+    /*public function store(OrderStoreRequest $request)
     {
         $order = Order::create([
             'customer_id' => $request->customer_id,
@@ -37,9 +37,15 @@ class OrderController extends Controller
 
         $cart = $request->user()->cart()->get();
         foreach ($cart as $item) {
+            if ($item->pivot->quantity >= $item->minimum_low) {
+                $price = $item->pivot->quantity * $item->low_price;
+            } else {
+                $price = $item->pivot->quantity * $item->price;
+            }
             $order->items()->create([
-                'price' => $item->price * $item->pivot->quantity,
+                'price' => $price,
                 'quantity' => $item->pivot->quantity,
+                'payment_method' => $request->payment_method,
                 'product_id' => $item->id,
             ]);
             $item->quantity = $item->quantity - $item->pivot->quantity;
@@ -51,5 +57,40 @@ class OrderController extends Controller
             'user_id' => $request->user()->id,
         ]);
         return 'success';
+    }*/
+    public function store(OrderStoreRequest $request)
+{
+    $order = Order::create([
+        'customer_id' => $request->customer_id,
+        'payment_method' => $request->payment_method,
+        'user_id' => $request->user()->id,
+    ]);
+
+    $cart = $request->user()->cart()->get();
+    foreach ($cart as $item) {
+        if ($item->pivot->quantity >= $item->minimum_low) {
+            $price = $item->pivot->quantity * $item->low_price;
+        } else {
+            $price = $item->pivot->quantity * $item->price;
+        }
+
+        $order->items()->create([
+            'price' => $price,
+            'quantity' => $item->pivot->quantity,
+            'product_id' => $item->id,
+        ]);
+
+        $item->quantity = $item->quantity - $item->pivot->quantity;
+        $item->save();
     }
+
+    $request->user()->cart()->detach();
+    $order->payments()->create([
+        'amount' => $request->amount,
+        'user_id' => $request->user()->id,
+    ]);
+
+    return 'success';
 }
+}
+

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('price', 8, 4);
             $table->integer('quantity')->default(1);
+            $table->enum('payment_method', ['Cash', 'Cashless'])->default('Cash');
             $table->foreignId('order_id');
             $table->foreignId('product_id');
             $table->timestamps();
