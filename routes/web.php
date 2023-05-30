@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,7 +27,6 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {
-    Route::resource('categories', CategoryController::class);
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory.index');
     Route::resource('products', ProductController::class);
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');

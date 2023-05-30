@@ -29,21 +29,25 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255', // Use 'first_name' instead of 'name'
-            'last_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
+            'username' => 'required|string|unique:users',
             'password' => 'required|string|min:8',
-            'role' => Rule::in(Role::pluck('id')->toArray()), // Use 'role' instead of 'roles'
+            'address' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'role' => Rule::in(Role::pluck('id')->toArray()),
         ]);
 
         $user = User::create([
-            'first_name' => $request->input('first_name'), // Use 'first_name' instead of 'name'
-            'last_name' => $request->input('last_name'),
+            'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'username' => $request->input('username'),
             'password' => Hash::make($request->input('password')),
+            'address' => $request->input('address'),
+            'phone_number' => $request->input('phone_number'),
         ]);
 
-        $user->roles()->sync([$request->input('role')]); // Use 'role' instead of 'roles'
+        $user->roles()->sync([$request->input('role')]);
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully.');
@@ -59,33 +63,40 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255', // Use 'first_name' instead of 'name'
-            'last_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'string',
                 'email',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'username' => [
+                'required',
+                'string',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'password' => 'nullable|string|min:8',
-            'role' => Rule::in(Role::pluck('id')->toArray()), // Use 'role' instead of 'roles'
+            'address' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'role' => Rule::in(Role::pluck('id')->toArray()),
         ]);
 
         $user->update([
-            'first_name' => $request->input('first_name'), // Use 'first_name' instead of 'name'
-            'last_name' => $request->input('last_name'),
+            'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'username' => $request->input('username'),
             'password' => $request->filled('password')
                 ? Hash::make($request->input('password'))
                 : $user->password,
+            'address' => $request->input('address'),
+            'phone_number' => $request->input('phone_number'),
         ]);
 
-        $user->roles()->sync([$request->input('role')]); // Use 'role' instead of 'roles'
+        $user->roles()->sync([$request->input('role')]);
 
         return redirect()->route('users.index')
             ->with('success', 'User updated successfully.');
     }
-
 
     public function destroy(User $user)
     {
@@ -94,6 +105,4 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
     }
-
-    
 }

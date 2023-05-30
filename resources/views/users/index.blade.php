@@ -2,6 +2,7 @@
 
 @section('title', 'Users List')
 @section('content-header', 'Users List')
+
 @section('content')
     <div class="card">
         <div class="card-header">
@@ -14,22 +15,34 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
+                        <th>Username</th>
                         <th>Email</th>
                         <th>Roles</th>
+                        <th>Address</th>
+                        <th>Phone Number</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach ($users as $user)
                     <tr>
-                        <td>{{ $user->first_name }} {{ $user->last_name }}</td> <!-- Display first_name and last_name separately -->
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->username }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
                             @foreach ($user->roles as $role)
                                 <span class="badge badge-info">{{ $role->name }}</span>
                             @endforeach
                         </td>
+                        <td>{{ $user->address }}</td>
+                        <td>{{ $user->phone_number }}</td>
+                        <td>{{ $user->created_at }}</td>
+                        <td>{{ $user->updated_at }}</td>
                         <td>
                             <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
                             <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
@@ -37,11 +50,11 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger"
                                  onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                             </form>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
-            </tbody>
+                </tbody>
             </table>
         </div>
     </div>

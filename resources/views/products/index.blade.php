@@ -14,32 +14,33 @@
     <div class="card-body">
         <table class="table">
             <!-- Import Modal -->
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel">Import Products</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="csvFile">CSV File:</label>
-                        <input type="file" class="form-control-file" id="csvFile" name="csvFile" accept=".csv">
+            <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importModalLabel">Import Products</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="csvFile">CSV File:</label>
+                                    <input type="file" class="form-control-file" id="csvFile" name="csvFile"
+                                        accept=".csv">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Import</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+            </div>
 
             <thead>
                 <tr>
@@ -65,16 +66,19 @@
                     <td>{{$product->price}}</td>
                     <td>{{$product->quantity}}</td>
                     <td>
-                        <span
-                            class="right badge badge-{{ $product->status ? 'success' : 'danger' }}">{{$product->status ? 'Active' : 'Inactive'}}</span>
+                        <span class="right badge badge-{{ $product->status ? 'success' : 'danger' }}">
+                            {{$product->status ? 'Active' : 'Inactive'}}
+                        </span>
                     </td>
                     <td>{{$product->created_at}}</td>
                     <td>{{$product->updated_at}}</td>
                     <td>
-                        <a href="{{ route('products.edit', $product) }}" class="btn btn-primary"><i
-                                class="fas fa-edit"></i></a>
-                        <button class="btn btn-danger btn-delete" data-url="{{route('products.destroy', $product)}}"><i
-                                class="fas fa-trash"></i></button>
+                        <a href="{{ route('products.edit', $product) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-danger btn-delete" data-url="{{route('products.destroy', $product)}}" data-token="{{csrf_token()}}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -83,9 +87,11 @@
         {{ $products->render() }}
     </div>
 </div>
+@yield('js')
 @endsection
 
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script>
     $(document).ready(function () {
@@ -97,9 +103,9 @@
                     cancelButton: 'btn btn-danger'
                 },
                 buttonsStyling: false
-                })
+            });
 
-                swalWithBootstrapButtons.fire({
+            swalWithBootstrapButtons.fire({
                 title: 'Are you sure?',
                 text: "Do you really want to delete this product?",
                 icon: 'warning',
@@ -107,16 +113,29 @@
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'No',
                 reverseButtons: true
-                }).then((result) => {
+            }).then((result) => {
                 if (result.value) {
-                    $.post($this.data('url'), {_method: 'DELETE', _token: '{{csrf_token()}}'}, function (res) {
-                        $this.closest('tr').fadeOut(500, function () {
-                            $(this).remove();
-                        })
-                    })
+                    var url = $this.data('url');
+                    var token = $this.data('token');
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: token
+                        },
+                        success: function (res) {
+                            $this.closest('tr').fadeOut(500, function () {
+                                $(this).remove();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr.responseText);
+                        }
+                    });
                 }
-            })
-        })
-    })
+            });
+        });
+    });
 </script>
 @endsection
