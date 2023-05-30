@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2023 at 08:24 PM
+-- Generation Time: May 29, 2023 at 10:52 PM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.1.10
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `pos_suge`
 --
+CREATE DATABASE IF NOT EXISTS `pos_suge` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `pos_suge`;
 
 -- --------------------------------------------------------
 
@@ -124,6 +126,16 @@ CREATE TABLE `price_history` (
   `fk_product_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `price_history`
+--
+
+INSERT INTO `price_history` (`price_id`, `normal_price`, `low_price`, `stock_price`, `created_at`, `fk_product_id`) VALUES
+(1, '24.99', '14.99', '9.99', '2023-05-29 20:38:22', 16),
+(2, '11000.00', '9500.00', '7000.00', '2023-05-29 20:38:43', 4),
+(3, '24.99', '14.99', '9.99', '2023-05-29 20:46:39', 17),
+(4, '11000.00', '9500.00', '7000.00', '2023-05-29 20:46:47', 4);
+
 -- --------------------------------------------------------
 
 --
@@ -153,10 +165,20 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`product_id`, `name`, `description`, `fk_cat_id`, `image`, `status`, `minimum_low`, `brand`, `created_at`, `updated_at`, `stock`, `normal_price`, `low_price`, `stock_price`) VALUES
 (2, 'Example Product 3', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:50:11', NULL, 10, '24.99', '14.99', '9.99'),
-(4, 'Example Product 3', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:23', NULL, 10, '24.99', '14.99', '9.99'),
+(4, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '50.00', 'Example Brand', '2023-05-29 20:38:43', '2023-05-29 20:38:43', 140, '11000.00', '9500.00', '7000.00'),
 (5, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:30', NULL, 10, '24.99', '14.99', '9.99'),
 (6, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:51:55', NULL, 10, '24.99', '14.99', '9.99'),
-(7, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:54:31', NULL, 10, '24.99', '14.99', '9.99');
+(7, 'Example Product 4', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-28 17:54:31', NULL, 10, '24.99', '14.99', '9.99'),
+(8, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:24:43', NULL, 10, '24.99', '14.99', '9.99'),
+(9, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:26:32', NULL, 10, '24.99', '14.99', '9.99'),
+(10, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:26:52', NULL, 10, '24.99', '14.99', '9.99'),
+(11, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:27:46', NULL, 10, '24.99', '14.99', '9.99'),
+(12, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:27:58', NULL, 10, '24.99', '14.99', '9.99'),
+(13, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:29:01', NULL, 10, '24.99', '14.99', '9.99'),
+(14, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 07:55:04', NULL, 10, '24.99', '14.99', '9.99'),
+(15, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 20:35:18', NULL, 10, '24.99', '14.99', '9.99'),
+(16, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 20:38:22', NULL, 10, '24.99', '14.99', '9.99'),
+(17, 'Example Product 7', 'This is an example product.', 2, 'https://example.com/product-image.jpg', 'active', '5.00', 'Example Brand', '2023-05-29 20:46:39', NULL, 10, '24.99', '14.99', '9.99');
 
 -- --------------------------------------------------------
 
@@ -192,6 +214,25 @@ CREATE TABLE `stock_history` (
   `fk_product_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `stock_history`
+--
+
+INSERT INTO `stock_history` (`id`, `stock`, `fk_product_id`, `created_at`) VALUES
+(1, 10, 9, '2023-05-29 07:26:32'),
+(2, 10, 11, '2023-05-29 07:27:46'),
+(3, 10, 12, '2023-05-29 07:27:58'),
+(4, 10, 13, '2023-05-29 07:29:01'),
+(5, 10, 4, '2023-05-29 07:31:18'),
+(6, 200, 4, '2023-05-29 07:31:37'),
+(7, 10, 14, '2023-05-29 07:55:04'),
+(8, 140, 4, '2023-05-29 07:55:12'),
+(9, 10, 15, '2023-05-29 20:35:18'),
+(10, 10, 16, '2023-05-29 20:38:22'),
+(11, 140, 4, '2023-05-29 20:38:43'),
+(12, 10, 17, '2023-05-29 20:46:39'),
+(13, 140, 4, '2023-05-29 20:46:47');
 
 -- --------------------------------------------------------
 
@@ -342,19 +383,25 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `price_history`
 --
 ALTER TABLE `price_history`
-  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `role_id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `stock_history`
+--
+ALTER TABLE `stock_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `users`

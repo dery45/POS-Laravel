@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { sum } from "lodash";
 
 class Cart extends Component {
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -99,7 +100,14 @@ class Cart extends Component {
     }
 
     getTotal(cart) {
-        const total = cart.map((c) => c.pivot.quantity * c.price);
+        const grosir=5000;
+        //if(c.pivot.quantity>=50){
+        //    const total = cart.map((c) => c.pivot.quantity * grosir);
+        //}
+        //else{
+            const total = cart.map((c) => c.pivot.quantity * c.price);
+        //}
+        
         return sum(total).toFixed(2);
     }
     handleClickDelete(product_id) {
@@ -225,13 +233,9 @@ class Cart extends Component {
                                 className="form-control"
                                 onChange={this.setCustomerId}
                             >
-                                <option value="">Walking Customer</option>
-                                {customers.map((cus) => (
-                                    <option
-                                        key={cus.id}
-                                        value={cus.id}
-                                    >{`${cus.first_name} ${cus.last_name}`}</option>
-                                ))}
+                                <option value="cash">Cash</option>
+                                <option value="cashless">Cashless</option>
+                                
                             </select>
                         </div>
                     </div>

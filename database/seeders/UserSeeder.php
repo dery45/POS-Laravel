@@ -18,46 +18,49 @@ class UserSeeder extends Seeder
         $admin = User::updateOrCreate([
             'email' => 'admin@gmail.com'
         ], [
-            'first_name' => 'Admin',
-            'last_name' => 'admin',
-            'email'=>'admin@gmail.com',
+            'name' => 'Admin',
+            'username' => 'admin',
+            'email' => 'admin@gmail.com',
             'password' => bcrypt('admin123')
         ]);
 
-        $admin -> assignRole('admin');
+        $adminRole = Role::where('name', 'admin')->first();
+        $admin->assignRole($adminRole);
 
         $superadmin = User::updateOrCreate([
             'email' => 'superadmin@gmail.com'
         ], [
-            'first_name' => 'superAdmin',
-            'last_name' => 'superadmin',
-            'email'=>'superadmin@gmail.com',
+            'name' => 'Super Admin',
+            'username' => 'superadmin',
+            'email' => 'superadmin@gmail.com',
             'password' => bcrypt('admin123')
         ]);
 
-        $superadmin -> assignRole('superadmin');
+        $superadminRole = Role::where('name', 'superadmin')->first();
+        $superadmin->assignRole($superadminRole);
 
         $inventory = User::updateOrCreate([
             'email' => 'inventory@gmail.com'
         ], [
-            'first_name' => 'Inventory',
-            'last_name' => 'Inventory',
-            'email'=>'inventory@gmail.com',
+            'name' => 'Inventory',
+            'username' => 'inventory',
+            'email' => 'inventory@gmail.com',
             'password' => bcrypt('admin123')
         ]);
 
-        $inventory -> assignRole('inventory');
+        $inventoryRole = Role::where('name', 'inventory')->first();
+        $inventory->assignRole($inventoryRole);
 
         $cashier = User::updateOrCreate([
             'email' => 'cashier@gmail.com'
         ], [
-            'first_name' => 'cashier',
-            'last_name' => 'cashier',
-            'email'=>'cashier@gmail.com',
+            'name' => 'Cashier',
+            'username' => 'cashier',
+            'email' => 'cashier@gmail.com',
             'password' => bcrypt('admin123')
         ]);
 
-        $cashier -> assignRole('cashier');
-
+        $cashierRole = Role::where('name', 'cashier')->first();
+        $cashier->assignRole($cashierRole);
     }
 }

@@ -73,6 +73,22 @@ class Product(db.Model):
         self.low_price = low_price
         self.stock_price = stock_price
 
+class PriceHistory(db.Model):
+    __tablename__ = 'price_history'
+
+    price_id = db.Column(db.Integer, primary_key=True)
+    fk_product_id = db.Column(db.Integer, nullable=False)
+    normal_price = db.Column(db.Numeric(10, 2), nullable=False)
+    low_price = db.Column(db.Numeric(10, 2), nullable=False)
+    stock_price = db.Column(db.Numeric(10, 2), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def __init__(self, fk_product_id, normal_price, low_price, stock_price):
+        self.fk_product_id = fk_product_id
+        self.normal_price = normal_price
+        self.low_price = low_price
+        self.stock_price = stock_price
+
 class StockHistory(db.Model):
     __tablename__ = 'stock_history'
 
@@ -129,13 +145,22 @@ class ProductResource(Resource):
             db.session.add(stock_history)
             db.session.commit()
 
+            #Insert the history table
+            price_history = PriceHistory(
+                fk_product_id = product.product_id,
+                normal_price = product.normal_price,
+                low_price = product.low_price,
+                stock_price = product.stock_price
+                )
+            # Add the product to the history
+            db.session.add(price_history)
+            db.session.commit()
+
             return {'message': 'Product created successfully', 'product_id': product.product_id}, 201
             
         except Exception as e:
             db.session.rollback()
-            return {'message': 'Failed to create product', 'error': str(e)}, 500
-        
-        
+            return {'message': 'Failed to create product', 'error': str(e)}, 500   
 
 class GetAllProductsResource(Resource):
     def get(self):
@@ -214,6 +239,18 @@ class PutProductResource(Resource):
             # Add the product to the history
             db.session.add(stock_history)
             db.session.commit()
+
+            #Insert the history table
+            price_history = PriceHistory(
+                fk_product_id = product.product_id,
+                normal_price = product.normal_price,
+                low_price = product.low_price,
+                stock_price = product.stock_price
+                )
+            # Add the product to the history
+            db.session.add(price_history)
+            db.session.commit()
+
             return {'message': 'Product updated successfully'}, 200
 
         except Exception as e:

@@ -13,7 +13,7 @@ class CreateDailyCapitalTable extends Migration
      */
     public function up()
     {
-        Schema::create('daily_capital', function (Blueprint $table) {
+        Schema::create('daily_capitals', function (Blueprint $table) {
             $table->id();
             $table->decimal('capital', 10, 2);
             $table->unsignedBigInteger('user_id');

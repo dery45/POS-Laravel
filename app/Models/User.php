@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasRoles;
     use Notifiable;
@@ -18,9 +18,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password',
+        'name', 'email', 'username', 'password', 'address', 'phone_number',
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -51,7 +50,7 @@ class User extends Authenticatable
 
     public function getFullname()
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return $this->name;
     }
 
     public function getAvatar()

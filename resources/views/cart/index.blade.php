@@ -13,7 +13,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div id="info" class="container-fluid">
         <div class="row mb-4">
             <div class="col-2"><input id="daily" class="form-control" type="text" name="" value="Modal Harian : {{config('settings.currency_symbol')}} {{number_format($capitalValue, 2)}}" readonly></div>
             <div class="col-2"><input id="cash" class="form-control" type="text" name="" value="Cash Income : {{config('settings.currency_symbol')}} {{number_format($cashIn, 2)}}" readonly></div>
@@ -51,13 +51,18 @@
 @endsection
 @section('js')
 <script>
-    if({{$capitalValue}}<1){
-        $(document).ready(function(){
+    $( document ).ready(function() {
+        console.log( "document loaded" );
+        if({{$capitalValue}}<1){
             $("#ModalHarian").modal('show');
-        });
-    }
-    $('#ModalHarian').on('hidden.bs.modal', function () {
-        window.location.replace("{{ route('home') }}");
-    })
+            $("#info").hide();
+            $("#cart").hide();
+        }
+        else{
+            $("#ModalHarian").modal('hide');
+            $("#info").show();
+            $("#cart").show();
+        }
+    });
 </script>
 @endsection

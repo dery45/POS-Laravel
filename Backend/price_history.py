@@ -55,20 +55,22 @@ class Product(db.Model):
         self.low_price = low_price
         self.stock_price = stock_price
 
-# Define the stock history model
-class StockHistory(db.Model):
-    __tablename__ = 'stock_history'
+class PriceHistory(db.Model):
+    __tablename__ = 'price_history'
 
-    id = db.Column(db.Integer, primary_key=True)
+    price_id = db.Column(db.Integer, primary_key=True)
     fk_product_id = db.Column(db.Integer, nullable=False)
-    stock = db.Column(db.Integer, nullable=False)
+    normal_price = db.Column(db.Numeric(10, 2), nullable=False)
+    low_price = db.Column(db.Numeric(10, 2), nullable=False)
+    stock_price = db.Column(db.Numeric(10, 2), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    def __init__(self, fk_product_id, stock):
+    def __init__(self, fk_product_id, normal_price, low_price, stock_price):
         self.fk_product_id = fk_product_id
-        self.stock = stock
+        self.normal_price = normal_price
+        self.low_price = low_price
+        self.stock_price = stock_price
 
-# Create an API resource for retrieving stock history by product_id
 class StockHistoryResource(Resource):
     def get(self):
         data = request.get_json()
@@ -76,31 +78,35 @@ class StockHistoryResource(Resource):
         if not fk_product_id:
             return {'message': 'Product ID Not Found'}, 400
 
-        stock_history = db.session.query(
-            StockHistory.id,
-            StockHistory.fk_product_id,
-            StockHistory.stock,
-            StockHistory.created_at,
+        price_history = db.session.query(
+            PriceHistory.price_id,
+            PriceHistory.fk_product_id,
+            PriceHistory.normal_price,
+            PriceHistory.low_price,
+            PriceHistory.stock_price,
+            PriceHistory.created_at,
             Product.name,
         ).join(
-            Product, StockHistory.fk_product_id == Product.product_id
+            Product, PriceHistory.fk_product_id == Product.product_id
         ).filter(
-            StockHistory.fk_product_id == fk_product_id
+            PriceHistory.fk_product_id == fk_product_id
         ).all()
 
         result = []
-        for entry in stock_history:
+        for entry in price_history:
             result.append({
-                'id': entry.id,
+                'id': entry.price_id,
                 'fk_product_id': entry.fk_product_id,
-                'stock': entry.stock,
+                'normal_price': entry.normal_price,
+                'low_price': entry.low_price,
+                'stock_price': entry.stock_price,
                 'created_at': entry.created_at,
                 'name': entry.name
             })
         return jsonify(result)
 
 api = Api(app)
-api.add_resource(StockHistoryResource, '/stockhistory')
+api.add_resource(StockHistoryResource, '/pricehistory')
 
 if __name__ == '__main__':
     app.run()

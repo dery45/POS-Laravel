@@ -4,8 +4,7 @@
 @section('content-header', 'Create Users')
 
 @section('content')
-
-<div class="card">
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">Create User</h3>
         </div>
@@ -13,20 +12,20 @@
             <form action="{{ route('users.store') }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label for="first_name">First Name</label> <!-- Use 'first_name' instead of 'name' -->
-                    <input type="text" name="first_name" id="first_name" class="form-control" required>
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="last_name">Last Name</label> <!-- Add 'last_name' field -->
-                    <input type="text" name="last_name" id="last_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" class="form-control" required>
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label for="role">Role</label>
@@ -36,6 +35,14 @@
                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" name="address" id="address" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="phone_number">Phone Number</label>
+                    <input type="text" name="phone_number" id="phone_number" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary">Create</button>
             </form>
