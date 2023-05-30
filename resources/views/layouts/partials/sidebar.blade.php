@@ -91,7 +91,7 @@
                 @endhasrole
 
                 <!-- Customers -->
-                @hasanyrole('superadmin|admin|inventory|cashier')
+                @hasanyrole('')
                 <li class="nav-item sidebar-item {{ 'customers' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('customers.index') }}" class="nav-link {{ activeSegment('customers') }}">
                         <i class="nav-icon fas fa-users"></i>
