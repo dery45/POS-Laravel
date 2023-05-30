@@ -15,10 +15,25 @@
         </div>
 
         <nav class="mt-2">
+        <style>
+            .sidebar-item {
+                /* Default styles for sidebar items */
+            }
+
+            .sidebar-item.active {
+                /* Styles for active sidebar items */
+                background-color: #252b61; /* Light purple color */
+                color: #ffff; /* White text color */
+                border-radius: 10px; /* Rounded corners */
+                display: flex; /* Enable flexbox */
+                /* ... */
+}
+        </style>
+
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
                 <!-- Dashboard -->
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'admin' == request()->path() ? 'active' : '' }}" >
                     <a href="{{ route('home') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
@@ -27,7 +42,7 @@
 
                 <!-- Categories -->
                 @hasanyrole('superadmin|admin|inventory')
-                <li class="nav-item">
+                <li class="nav-item nav-item sidebar-item {{ 'categories' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('categories.index') }}" class="nav-link {{ activeSegment('categories') }}">
                         <i class="nav-icon fas  fa-suitcase"></i>
                         <p>Kategori</p>
@@ -37,7 +52,7 @@
 
                 <!-- Products -->
                 @hasanyrole('superadmin|admin|inventory')
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'products' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('products.index') }}" class="nav-link {{ activeSegment('products') }}">
                         <i class="nav-icon fas fa-th-large"></i>
                         <p>Produk</p>
@@ -47,7 +62,7 @@
 
                 <!-- Cashier -->
                 @hasanyrole('superadmin|admin|cashier')
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'cart' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('cart.index') }}" class="nav-link {{ activeSegment('cart') }}">
                         <i class="nav-icon fas fa-calculator"></i>
                         <p>Kasir</p>
@@ -57,7 +72,7 @@
 
                 <!-- Sales Orders -->
                 @hasanyrole('superadmin|admin|cashier')
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'orders' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('orders.index') }}" class="nav-link {{ activeSegment('orders') }}">
                         <i class="nav-icon fas fa-cart-plus"></i>
                         <p>Penjualan</p>
@@ -67,7 +82,7 @@
 
                 <!-- Users -->
                 @hasrole('superadmin')
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'users' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('users.index') }}" class="nav-link {{ activeSegment('users') }}">
                         <i class="nav-icon fas fa-user"></i>
                         <p>Users</p>
@@ -77,7 +92,7 @@
 
                 <!-- Customers -->
                 @hasanyrole('superadmin|admin|inventory|cashier')
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'customers' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('customers.index') }}" class="nav-link {{ activeSegment('customers') }}">
                         <i class="nav-icon fas fa-users"></i>
                         <p>Pelanggan</p>
@@ -86,7 +101,7 @@
                 @endhasanyrole
 
                 <!-- Settings -->
-                <li class="nav-item">
+                <li class="nav-item sidebar-item {{ 'settings' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('settings.index') }}" class="nav-link {{ activeSegment('settings') }}">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Pengaturan</p>

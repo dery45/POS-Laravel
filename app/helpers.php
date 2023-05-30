@@ -5,3 +5,4 @@ if (!function_exists('activeSegment')) {
         return request()->segment($segment) == $name ? $class : '';
     }
 }
+
