@@ -29,11 +29,12 @@ class CartController extends Controller
         }
         return view('cart.index',[
             'pendapatan' => $orders->where('created_at', '>=', date('Y-m-d').' 00:00:00')->map(function($i) {
-            if($i->receivedAmount() > $i->total()) {
-                return $i->total();
-            }
-            return $i->receivedAmount();
+                if($i->receivedAmount() > $i->total()) {
+                    return $i->total();
+                }
+                return $i->receivedAmount();
             })->sum(),
+            
             'capitalValue' => $capitalValue,
             'cashIn'=>$cashin,
             'cashlessIn'=>$cashlessin,

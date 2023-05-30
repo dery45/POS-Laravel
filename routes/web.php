@@ -24,10 +24,11 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::post('/cart/capital',[CartController::class, 'modal'])->name('cart.capital');
     Route::delete('/cart/delete', [CartController::class, 'delete']);
     Route::delete('/cart/empty', [CartController::class, 'empty']);
-    Route::resource('orders', OrderController::class)->only(['index', 'show']);
+    Route::resource('orders', OrderController::class)->only(['index', 'show', 'create', 'store']);
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {
+    Route::resource('categories', CategoryController::class);
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory.index');
     Route::resource('products', ProductController::class);
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');

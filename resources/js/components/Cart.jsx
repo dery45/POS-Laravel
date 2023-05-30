@@ -128,50 +128,51 @@ class Cart extends Component {
     addProductToCart(barcode) {
         let product = this.state.products.find((p) => p.barcode === barcode);
         if (!!product) {
-            let cart = this.state.cart.find((c) => c.id === product.id);
-            if (!!cart) {
-                this.setState({
-                    cart: this.state.cart.map((c) => {
-                        if (c.id === product.id && product.quantity > c.pivot.quantity) {
-                            if (c.pivot.quantity >= 50) {
-                                c.price = product.wholesale_price;
-                            } else {
-                                c.price = product.price;
-                            }
-                            c.pivot.quantity = c.pivot.quantity + 1;
-                        }
-                        return c;
-                    }),
-                });
-            } else {
-                if (product.quantity > 0) {
-                    const price = product.quantity >= 50 ? product.wholesale_price : product.price;
-    
-                    product = {
-                        ...product,
-                        pivot: {
-                            quantity: 1,
-                            product_id: product.id,
-                            user_id: 1,
-                        },
-                        price: price,
-                    };
-    
-                    this.setState({ cart: [...this.state.cart, product] });
+          let cart = this.state.cart.find((c) => c.id === product.id);
+          if (!!cart) {
+            this.setState({
+              cart: this.state.cart.map((c) => {
+                if (c.id === product.id && product.quantity > c.pivot.quantity) {
+                  if (c.pivot.quantity >= 50) {
+                    c.price = product.wholesale_price;
+                  } else {
+                    c.price = product.price;
+                  }
+                  c.pivot.quantity = c.pivot.quantity + 1;
                 }
+                return c;
+              }),
+            });
+          } else {
+            if (product.quantity > 0) {
+              const price = product.quantity >= 50 ? product.wholesale_price : product.price;
+      
+              product = {
+                ...product,
+                pivot: {
+                  quantity: 1,
+                  product_id: product.id,
+                  user_id: 1,
+                },
+                price: price,
+              };
+      
+              this.setState({ cart: [...this.state.cart, product] });
             }
-    
-            axios
-                .post("/cart", { barcode })
-                .then((res) => {
-                    // this.loadCart();
-                    console.log(res);
-                })
-                .catch((err) => {
-                    Swal.fire("Error!", err.response.data.message, "error");
-                });
+          }
+      
+          axios
+            .post("/cart", { barcode })
+            .then((res) => {
+              this.loadCart();
+              console.log(res);
+            })
+            .catch((err) => {
+              Swal.fire("Error!", err.response.data.message, "error");
+            });
         }
-    }
+      }
+      
     
 
     setCustomerId(event) {
