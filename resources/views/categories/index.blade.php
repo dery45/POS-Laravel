@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Category List')
-@section('content-header', 'Category List')
+@section('title', 'List Kategori')
+@section('content-header', 'List Kategori')
 @section('content-actions')
-<a href="{{route('categories.create')}}" class="btn btn-primary">Create Category</a>
+<a href="{{route('categories.create')}}" class="btn btn-primary">Tambah Kategori</a>
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
@@ -17,10 +17,10 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Category Name</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Actions</th>
+                    <th>Nama Kategori</th>
+                    <th>Tgl Dibuat</th>
+                    <th>Tgl Diubah</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,12 +60,12 @@
             })
 
             swalWithBootstrapButtons.fire({
-                title: 'Are you sure?',
-                text: "Do you really want to delete this category?",
+                title: 'Hapus?',
+                text: "Apakah anda yakin ingin menhpaus data?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No',
+                confirmButtonText: 'Ya, Hapus data!',
+                cancelButtonText: 'Batal',
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {

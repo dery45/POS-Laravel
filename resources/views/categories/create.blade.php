@@ -2,8 +2,8 @@
 
 @extends('layouts.admin')
 
-@section('title', 'Create Category')
-@section('content-header', 'Create Category')
+@section('title', 'Tambah Kategori')
+@section('content-header', 'Tambah Kategori')
 
 @section('content')
 
@@ -14,9 +14,9 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="category_name">Category Name</label>
+                    <label for="category_name">Nama Kategori</label>
                     <input type="text" name="category_name" class="form-control @error('category_name') is-invalid @enderror" id="category_name"
-                        placeholder="Category Name" value="{{ old('category_name') }}">
+                        placeholder="Nama Kategori" value="{{ old('category_name') }}">
                     @error('category_name')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -24,7 +24,7 @@
                     @enderror
                 </div>
 
-                <button class="btn btn-primary" type="submit">Create</button>
+                <button class="btn btn-primary" type="submit">Simpan</button>
             </form>
         </div>
     </div>

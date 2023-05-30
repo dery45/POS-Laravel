@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('title', 'Product List')
-@section('content-header', 'Product List')
+@section('title', 'List Produk')
+@section('content-header', 'List Produk')
 @section('content-actions')
 <button class="btn btn-success" data-toggle="modal" data-target="#importModal">Import CSV</button>
-<a href="{{route('products.create')}}" class="btn btn-primary">Create Product</a>
+<a href="{{route('products.create')}}" class="btn btn-primary">Tambah Data</a>
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
@@ -19,7 +19,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="importModalLabel">Import Products</h5>
+                            <h5 class="modal-title" id="importModalLabel">Import Produk</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary">Import</button>
                             </div>
                         </form>
@@ -46,21 +46,21 @@
 
             <form action="{{ route('search') }}" method="GET">
                 <input type="text" name="keyword" placeholder="Search..." />
-                <button type="submit">Search</button>
+                <button type="submit">Cari</button>
             </form>
 
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Image</th>
+                    <th>Nama</th>
+                    <th>Gambar</th>
                     <th>Barcode</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
                     <th>Status</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Actions</th>
+                    <th>Tgl Dibuat</th>
+                    <th>Tgl Diubah</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,12 +113,12 @@
             });
 
             swalWithBootstrapButtons.fire({
-                title: 'Are you sure?',
-                text: "Do you really want to delete this product?",
+                title: 'Hapus?',
+                text: "Apakah anda yakin ingin menhpaus data?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No',
+                confirmButtonText: 'Ya, Hapus data!',
+                cancelButtonText: 'Batal',
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {

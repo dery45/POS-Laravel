@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Users List')
-@section('content-header', 'Users List')
+@section('title', 'Daftar User')
+@section('content-header', 'Daftar User')
 
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">User Management</h3>
+            <h3 class="card-title">Pengaturan User</h3>
             <div class="card-tools">
-                <a href="{{ route('users.create') }}" class="btn btn-primary">Create User</a>
+                <a href="{{ route('users.create') }}" class="btn btn-primary">Tambah Akun</a>
             </div>
         </div>
         <div class="card-body">
@@ -16,15 +16,15 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
+                        <th>Nama</th>
                         <th>Username</th>
                         <th>Email</th>
-                        <th>Roles</th>
-                        <th>Address</th>
-                        <th>Phone Number</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
-                        <th>Actions</th>
+                        <th>Akses</th>
+                        <th>Alamat</th>
+                        <th>Nomor Hp</th>
+                        <th>Tgl Dibuat</th>
+                        <th>Tgl Diubah</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,12 +44,12 @@
                         <td>{{ $user->created_at }}</td>
                         <td>{{ $user->updated_at }}</td>
                         <td>
-                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Ubah</a>
                             <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger"
-                                 onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                 onclick="return confirm('Are you sure you want to delete this user?')">Hapus</button>
                             </form>
                         </td>
                     </tr>

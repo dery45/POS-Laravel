@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Product')
-@section('content-header', 'Edit Product')
+@section('title', 'Ubah Produk')
+@section('content-header', 'Ubah Produk')
 
 @section('content')
 
@@ -167,7 +167,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
         </form>
     </div>
 </div>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Product')
-@section('content-header', 'Create Product')
+@section('title', 'Tambah Produk')
+@section('content-header', 'Tambah Produk')
 
 @section('content')
 
@@ -14,7 +14,7 @@
             <div class="form-group">
                 <label for="name">Nama Produk</label>
                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name"
-                    placeholder="Name" value="{{ old('name') }}">
+                    placeholder="Nama" value="{{ old('name') }}">
                 @error('name')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -25,7 +25,7 @@
             <div class="form-group">
                 <label for="description">Deskripsi</label>
                 <textarea name="description" class="form-control @error('description') is-invalid @enderror"
-                    id="description" placeholder="Description">{{ old('description') }}</textarea>
+                    id="description" placeholder="Deskripsi produk">{{ old('description') }}</textarea>
                 @error('description')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -36,7 +36,7 @@
             <div class="form-group">
                 <label for="category_product">Kategori</label>
                 <select name="category_product" class="form-control @error('category_product') is-invalid @enderror" id="category_product">
-                    <option value="">Select Category</option>
+                    <option value="">Pilih Kategori</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                     @endforeach
@@ -52,9 +52,9 @@
                 <label for="image">Gambar</label>
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" name="image" id="image">
-                    <label class="custom-file-label" for="image">Choose file</label>
+                    <label class="custom-file-label" for="image">Pilih File</label>
                 </div>
-                <img id="image-preview" src="" alt="Image Preview" style="max-height: 200px; margin-top: 10px;">
+                <img id="image-preview" src="" alt="Preview" style="max-height: 200px; margin-top: 10px;">
                 @error('image')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -87,7 +87,7 @@
             <div class="form-group">
                 <label for="price">Harga</label>
                 <input type="text" name="price" class="form-control @error('price') is-invalid @enderror" id="price"
-                    placeholder="Price" value="{{ old('price') }}">
+                    placeholder="Harga Normal" value="{{ old('price') }}">
                 @error('price')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -100,7 +100,7 @@
             <div class="form-group">
                 <label for="minimum_low">Jumlah minimum harga grosir</label>
                 <input type="text" name="minimum_low" class="form-control @error('minimum_low') is-invalid @enderror"
-                    id="minimum_low" placeholder="Minimum Low" value="{{ old('minimum_low') }}">
+                    id="minimum_low" placeholder="" value="{{ old('minimum_low') }}">
                 @error('minimum_low')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -112,7 +112,7 @@
             <div class="form-group">
                 <label for="low_price">Harga grosir</label>
                 <input type="text" name="low_price" class="form-control @error('low_price') is-invalid @enderror"
-                    id="low_price" placeholder="Low Price" value="{{ old('low_price') }}">
+                    id="low_price" placeholder="" value="{{ old('low_price') }}">
                 @error('low_price')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -123,7 +123,7 @@
             <div class="form-group">
                 <label for="stock_price">Harga modal</label>
                 <input type="text" name="stock_price" class="form-control @error('stock_price') is-invalid @enderror"
-                    id="stock_price" placeholder="Stock Price" value="{{ old('stock_price') }}">
+                    id="stock_price" placeholder="" value="{{ old('stock_price') }}">
                 @error('stock_price')
                 <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -155,7 +155,7 @@
                 @enderror
             </div>
 
-            <button class="btn btn-primary" type="submit">Buat Produk</button>
+            <button class="btn btn-primary" type="submit">Simpan</button>
         </form>
     </div>
 </div>

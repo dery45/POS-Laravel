@@ -2,8 +2,8 @@
 
 @extends('layouts.admin')
 
-@section('title', 'Edit Category')
-@section('content-header', 'Edit Category')
+@section('title', 'Ubah Kategori')
+@section('content-header', 'Ubah Kategori')
 
 @section('content')
 
@@ -15,9 +15,9 @@
                 @method('PUT')
 
                 <div class="form-group">
-                    <label for="category_name">Category Name</label>
+                    <label for="category_name">Nama Kategori</label>
                     <input type="text" name="category_name" class="form-control @error('category_name') is-invalid @enderror" id="category_name"
-                        placeholder="Category Name" value="{{ old('category_name', $category->category_name) }}">
+                        placeholder="Nama Kategori" value="{{ old('category_name', $category->category_name) }}">
                     @error('category_name')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
