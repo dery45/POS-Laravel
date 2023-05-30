@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             $table->string('image')->nullable();
             $table->string('barcode');
             $table->boolean('status')->default(1);
-            $table->decimal('minimum_low', 10, 2);
+            $table->unsignedInteger('minimum_low');
             $table->string('brand')->nullable();
             $table->decimal('low_price', 10, 2)->nullable();
             $table->decimal('stock_price', 10, 2)->nullable();

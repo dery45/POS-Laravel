@@ -7,6 +7,9 @@ use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Category;
+use App\Events\ProductUpdated;
+use App\Models\PriceHistory;
+use App\Models\StockHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -76,6 +79,17 @@ class ProductController extends Controller
         if (!$product) {
             return redirect()->back()->with('error', 'Sorry, there was a problem while creating the product.');
         }
+        $priceHistory = new PriceHistory();
+        $priceHistory->low_price = $product->low_price;
+        $priceHistory->stock_price = $product->stock_price;
+        $priceHistory->price = $product->price;
+        $priceHistory->fk_product_id = $product->id;
+        $priceHistory->save();
+        $stockHistory = new StockHistory();
+        $stockHistory->fk_product_id = $product->id;
+        $stockHistory->quantity = $product->quantity;
+        $stockHistory->created_at = now();
+        $stockHistory->save();
         return redirect()->route('products.index')->with('success', 'Success, your product has been created.');
     }
 
@@ -112,21 +126,25 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, Product $product)
     {
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->barcode = $request->barcode;
-        $product->price = $request->price;
-        $product->quantity = $request->quantity;
-        $product->status = $request->status;
-
-        $categoryProduct = $request->category_product ?: null;
-        $product->category_product = $categoryProduct;
-
-        $product->minimum_low = $request->minimum_low;
-        $product->brand = $request->brand;
-        $product->low_price = $request->low_price;
-        $product->stock_price = $request->stock_price;
-
+        $oldPrice = $product->price;
+        $oldLow_Price = $product->low_price;
+        $oldStock_Price = $product->stock_price;
+        $oldQuantity = $product->quantity;
+    
+        $updatedData = [
+            'name' => $request->name,
+            'description' => $request->description,
+            'barcode' => $request->barcode,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
+            'status' => $request->status,
+            'category_product' => $request->category_product ?: null,
+            'minimum_low' => $request->minimum_low,
+            'brand' => $request->brand,
+            'low_price' => $request->low_price,
+            'stock_price' => $request->stock_price,
+        ];
+    
         if ($request->hasFile('image')) {
             // Delete old image
             if ($product->image) {
@@ -134,15 +152,59 @@ class ProductController extends Controller
             }
             // Store image
             $image_path = $request->file('image')->store('products', 'public');
-            // Save to Database
-            $product->image = $image_path;
+            $updatedData['image'] = $image_path;
+        }
+    
+        $product->update($updatedData);
+    
+        // Check if the price has been changed
+        if ($oldPrice != $product->price) {
+            // Create a new entry in price_histories table
+            $priceHistory = new PriceHistory();
+            $priceHistory->low_price = $product->low_price;
+            $priceHistory->stock_price = $product->stock_price;
+            $priceHistory->price = $product->price;
+            $priceHistory->fk_product_id = $product->id;
+            $priceHistory->save();
         }
 
-        if (!$product->save()) {
-            return redirect()->back()->with('error', 'Sorry, there was a problem while updating the product.');
+        // Check if the price has been changed
+        if ($oldStock_Price != $product->stock_price) {
+            // Create a new entry in price_histories table
+            $priceHistory = new PriceHistory();
+            $priceHistory->low_price = $product->low_price;
+            $priceHistory->stock_price = $product->stock_price;
+            $priceHistory->price = $product->price;
+            $priceHistory->fk_product_id = $product->id;
+            $priceHistory->save();
         }
+
+        if ($oldLow_Price != $product->low_price) {
+            // Create a new entry in price_histories table
+            $priceHistory = new PriceHistory();
+            $priceHistory->low_price = $product->low_price;
+            $priceHistory->stock_price = $product->stock_price;
+            $priceHistory->price = $product->price;
+            $priceHistory->fk_product_id = $product->id;
+            $priceHistory->save();
+        }
+
+         // Check if the quantity has been changed
+         if ($oldQuantity != $product->quantity) {
+            // Create a new entry in the stock_history table
+            $stockHistory = new StockHistory();
+            $stockHistory->fk_product_id = $product->id;
+            $stockHistory->quantity = $product->quantity;
+            $stockHistory->created_at = now();
+            $stockHistory->save();
+        }
+
+        event(new ProductUpdated($product));
+    
         return redirect()->route('products.index')->with('success', 'Success, your product has been updated.');
     }
+    
+
 
     /**
      * Remove the specified resource from storage.
