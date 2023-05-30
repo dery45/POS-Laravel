@@ -32,6 +32,7 @@ Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () 
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory.index');
     Route::resource('products', ProductController::class);
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::get('/search', 'SearchController@search')->name('search');
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {

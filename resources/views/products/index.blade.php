@@ -42,6 +42,12 @@
                     </div>
                 </div>
             </div>
+            <!-- resources/views/search/form.blade.php -->
+
+            <form action="{{ route('search') }}" method="GET">
+                <input type="text" name="keyword" placeholder="Search..." />
+                <button type="submit">Search</button>
+            </form>
 
             <thead>
                 <tr>
