@@ -1,8 +1,63 @@
 @extends('layouts.admin')
 
-@section('title', 'Open POS')
+@section('title', 'Kasir')
+
+@section('css')
+<style>
+    .infocart{
+        margin-bottom: 2%; 
+        margin-right: 1%; 
+        width: 10%
+    }
+</style>
+@endsection
 
 @section('content')
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-2"><input id="daily" class="form-control" type="text" name="" value="Modal Harian : {{config('settings.currency_symbol')}} {{number_format($capitalValue, 2)}}" readonly></div>
+            <div class="col-2"><input id="cash" class="form-control" type="text" name="" value="Cash Income : {{config('settings.currency_symbol')}} {{number_format($cashIn, 2)}}" readonly></div>
+            <div class="col-2"><input id="cashless" class="form-control" type="text" name="" value="Cahsless Income : {{config('settings.currency_symbol')}} {{number_format($cashlessIn, 2)}}" readonly></div>
+            <div class="col-2"><input id="total" class="form-control" type="text" name="" value="Total Income : {{config('settings.currency_symbol')}} {{number_format($pendapatan, 2)}}" readonly></div>
+        </div>
+    </div>
+    <div class="modal fade" id="ModalHarian" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Input Modal Harian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('cart.capital') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="csvFile">Modal Harian (Rp) :</label>
+                        <input type="text" class="form-control" id="capital" name="capital">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     <div id="cart"></div>
-
+@endsection
+@section('js')
+<script>
+    if({{$capitalValue}}<1){
+        $(document).ready(function(){
+            $("#ModalHarian").modal('show');
+        });
+    }
+    $('#ModalHarian').on('hidden.bs.modal', function () {
+        window.location.replace("{{ route('home') }}");
+    })
+</script>
 @endsection

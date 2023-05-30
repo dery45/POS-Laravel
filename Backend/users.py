@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 # from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from sqlalchemy import text
 import json
@@ -63,23 +64,28 @@ check_database_connection()
 # Endpoint to create a new user
 class CreateUserResource(Resource):
     def post(self):
-        username = request.json.get('username')
-        name = request.json.get('name')
-        address = request.json.get('address')
-        phone_number = request.json.get('phone_number')
-        fk_role_id = request.json.get('fk_role_id')
-        password = request.json.get('password')
-        email = request.json.get('email')
+        try:
+            username = request.json.get('username')
+            name = request.json.get('name')
+            address = request.json.get('address')
+            phone_number = request.json.get('phone_number')
+            fk_role_id = request.json.get('fk_role_id')
+            password = request.json.get('password')
+            email = request.json.get('email')
 
-        # Create a new user instance
-        user = User(username=username, name=name, address=address, phone_number=phone_number,
-                    fk_role_id=fk_role_id, password=password, email=email)
+            # Create a new user instance
+            user = User(username=username, name=name, address=address, phone_number=phone_number,
+                        fk_role_id=fk_role_id, password=password, email=email)
 
-        # Add the user to the database
-        db.session.add(user)
-        db.session.commit()
+            # Add the user to the database
+            db.session.add(user)
+            db.session.commit()
 
-        return jsonify({'message': 'User created successfully'})
+            return jsonify({'message': 'User created successfully'})
+
+        except IntegrityError:
+        # Handle the uniqueness constraint violation error
+            return jsonify({'message': 'Username already taken'})
 
 # Endpoint to get user details by ID
 class GetUserResource(Resource):
@@ -92,8 +98,10 @@ class GetUserResource(Resource):
             data = {
                 'id': user_obj.id,
                 'name': user_obj.name,
+                'username':user_obj.username,
                 'address': user_obj.address,
                 'phone_number': user_obj.phone_number,
+                'email':user_obj.email,
                 'role': {
                     'id': role_obj.role_id,
                     'name': role_obj.name,
@@ -127,42 +135,48 @@ class UpdateUserResource(Resource):
             )
             return response
 
-        # Retrieve the updated data from the request
-        updated_data = request.json
+        try:
+            # Retrieve the updated data from the request
+            updated_data = request.json
 
-        # Update the user object with the new data
-        user.name = updated_data.get('name')
-        user.address = updated_data.get('address')
-        user.phone_number = updated_data.get('phone_number')
-        user.fk_role_id = updated_data.get('fk_role_id')
-        user.email = updated_data.get('email')
-        user.password = updated_data.get('password')
+            # Update the user object with the new data
+            user.name = updated_data.get('name')
+            user.address = updated_data.get('address')
+            user.phone_number = updated_data.get('phone_number')
+            user.fk_role_id = updated_data.get('fk_role_id')
+            user.email = updated_data.get('email')
+            user.password = updated_data.get('password')
+            user.username = updated_data.get('username')
 
-        # Save the changes to the database
-        db.session.commit()
+            # Save the changes to the database
+            db.session.commit()
 
-        # Prepare the response
-        user = db.session.query(User, Role).join(Role).filter(User.id == user_id).first()
-        user_obj, role_obj = user
-        data = {
-                'id': user_obj.id,
-                'name': user_obj.name,
-                'username':user_obj.username,
-                'address': user_obj.address,
-                'phone_number': user_obj.phone_number,
-                'email':user_obj.email,
-                'role': {
-                    'id': role_obj.role_id,
-                    'name': role_obj.name,
-                    'access': role_obj.access
+            # Prepare the response
+            user = db.session.query(User, Role).join(Role).filter(User.id == user_id).first()
+            user_obj, role_obj = user
+            data = {
+                    'id': user_obj.id,
+                    'name': user_obj.name,
+                    'username':user_obj.username,
+                    'address': user_obj.address,
+                    'phone_number': user_obj.phone_number,
+                    'email':user_obj.email,
+                    'role': {
+                        'id': role_obj.role_id,
+                        'name': role_obj.name,
+                        'access': role_obj.access
+                    }
                 }
-            }
-        response = app.response_class(
-                response=json.dumps(data),
-                status=200,
-                mimetype='application/json'
-            )
-        return response
+            response = app.response_class(
+                    response=json.dumps(data),
+                    status=200,
+                    mimetype='application/json'
+                )
+            return response
+
+        except IntegrityError:
+        # Handle the uniqueness constraint violation error
+            return jsonify({'message': 'Username already taken'})
 
 # Endpoint to delete a user by ID
 class DeleteUserResource(Resource):
@@ -176,7 +190,7 @@ class DeleteUserResource(Resource):
 
             return jsonify({'message': 'User deleted successfully'})
         else:
-            return jsonify({'error': 'User not found'}), 404
+            return jsonify({'message': 'User not found'})
 
 # Endpoint to retrive all users
 class GetAllUsersResource(Resource):
