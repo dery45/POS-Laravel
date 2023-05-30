@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['middleware' => ['role:superadmin|admin|cashier', 'token.expired']], function () {
+Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
@@ -27,7 +27,7 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier', 'token.expired']
     Route::resource('orders', OrderController::class)->only(['index', 'show', 'create', 'store']);
 });
 
-Route::group(['middleware' => ['role:superadmin|admin|inventory', 'token.expired']], function () {
+Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {
     Route::resource('categories', CategoryController::class);
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory.index');
     Route::resource('products', ProductController::class);
