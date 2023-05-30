@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Events\ProductUpdated;
 use App\Models\PriceHistory;
+use App\Models\StockHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -84,6 +85,11 @@ class ProductController extends Controller
         $priceHistory->price = $product->price;
         $priceHistory->fk_product_id = $product->id;
         $priceHistory->save();
+        $stockHistory = new StockHistory();
+        $stockHistory->fk_product_id = $product->id;
+        $stockHistory->quantity = $product->quantity;
+        $stockHistory->created_at = now();
+        $stockHistory->save();
         return redirect()->route('products.index')->with('success', 'Success, your product has been created.');
     }
 
@@ -123,6 +129,7 @@ class ProductController extends Controller
         $oldPrice = $product->price;
         $oldLow_Price = $product->low_price;
         $oldStock_Price = $product->stock_price;
+        $oldQuantity = $product->quantity;
     
         $updatedData = [
             'name' => $request->name,
@@ -181,6 +188,18 @@ class ProductController extends Controller
             $priceHistory->fk_product_id = $product->id;
             $priceHistory->save();
         }
+
+         // Check if the quantity has been changed
+         if ($oldQuantity != $product->quantity) {
+            // Create a new entry in the stock_history table
+            $stockHistory = new StockHistory();
+            $stockHistory->fk_product_id = $product->id;
+            $stockHistory->quantity = $product->quantity;
+            $stockHistory->created_at = now();
+            $stockHistory->save();
+        }
+
+        event(new ProductUpdated($product));
     
         return redirect()->route('products.index')->with('success', 'Success, your product has been updated.');
     }
