@@ -24,7 +24,7 @@
                 /* Styles for active sidebar items */
                 background-color: #252b61; /* Light purple color */
                 color: #ffff; /* White text color */
-                border-radius: 10px; /* Rounded corners */
+                border-radius: 5px; /* Rounded corners */
                 display: flex; /* Enable flexbox */
                 /* ... */
 }

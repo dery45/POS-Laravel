@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('title', 'List Produk')
-@section('content-header', 'List Produk')
+@section('title', 'Product List')
+@section('content-header', 'Product List')
 @section('content-actions')
 <button class="btn btn-success" data-toggle="modal" data-target="#importModal">Import CSV</button>
-<a href="{{route('products.create')}}" class="btn btn-primary">Buat Produk</a>
+<a href="{{route('products.create')}}" class="btn btn-primary">Create Product</a>
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
@@ -19,7 +19,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="importModalLabel">Import CSV</h5>
+                            <h5 class="modal-title" id="importModalLabel">Import Products</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -29,6 +29,7 @@
                             <div class="modal-body">
                                 <div class="form-group">
                                     <label for="csvFile">CSV File:</label>
+                                    <a href="{{ asset('csv/template-product.csv') }}">Download CSV Template</a>
                                     <input type="file" class="form-control-file" id="csvFile" name="csvFile"
                                         accept=".csv">
                                 </div>
@@ -45,15 +46,15 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nama Produk</th>
-                    <th>Gambar</th>
-                    <th>Harga</th>
-                    <th>Harga Grosir</th>
-                    <th>Stok</th>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Barcode</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
                     <th>Status</th>
-                    <th>Tanggal dibuat</th>
-                    <th>Terakhir diupdate</th>
-                    <th>Aksi</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,8 +63,8 @@
                     <td>{{$product->id}}</td>
                     <td>{{$product->name}}</td>
                     <td><img class="product-img" src="{{ Storage::url($product->image) }}" alt=""></td>
+                    <td>{{$product->barcode}}</td>
                     <td>{{$product->price}}</td>
-                    <td>{{$product->low_price}}</td>
                     <td>{{$product->quantity}}</td>
                     <td>
                         <span class="right badge badge-{{ $product->status ? 'success' : 'danger' }}">
