@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { sum } from "lodash";
 
 class Cart extends Component {
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -99,7 +100,14 @@ class Cart extends Component {
     }
 
     getTotal(cart) {
-        const total = cart.map((c) => c.pivot.quantity * c.price);
+        const grosir=5000;
+        //if(c.pivot.quantity>=50){
+        //    const total = cart.map((c) => c.pivot.quantity * grosir);
+        //}
+        //else{
+            const total = cart.map((c) => c.pivot.quantity * c.price);
+        //}
+        
         return sum(total).toFixed(2);
     }
     handleClickDelete(product_id) {
@@ -128,51 +136,47 @@ class Cart extends Component {
     addProductToCart(barcode) {
         let product = this.state.products.find((p) => p.barcode === barcode);
         if (!!product) {
-          let cart = this.state.cart.find((c) => c.id === product.id);
-          if (!!cart) {
-            this.setState({
-              cart: this.state.cart.map((c) => {
-                if (c.id === product.id && product.quantity > c.pivot.quantity) {
-                  if (c.pivot.quantity >= 50) {
-                    c.price = product.wholesale_price;
-                  } else {
-                    c.price = product.price;
-                  }
-                  c.pivot.quantity = c.pivot.quantity + 1;
+            // if product is already in cart
+            let cart = this.state.cart.find((c) => c.id === product.id);
+            if (!!cart) {
+                // update quantity
+                this.setState({
+                    cart: this.state.cart.map((c) => {
+                        if (
+                            c.id === product.id &&
+                            product.quantity > c.pivot.quantity
+                        ) {
+                            c.pivot.quantity = c.pivot.quantity + 1;
+                        }
+                        return c;
+                    }),
+                });
+            } else {
+                if (product.quantity > 0) {
+                    product = {
+                        ...product,
+                        pivot: {
+                            quantity: 1,
+                            product_id: product.id,
+                            user_id: 1,
+                        },
+                    };
+
+                    this.setState({ cart: [...this.state.cart, product] });
                 }
-                return c;
-              }),
-            });
-          } else {
-            if (product.quantity > 0) {
-              const price = product.quantity >= 50 ? product.wholesale_price : product.price;
-      
-              product = {
-                ...product,
-                pivot: {
-                  quantity: 1,
-                  product_id: product.id,
-                  user_id: 1,
-                },
-                price: price,
-              };
-      
-              this.setState({ cart: [...this.state.cart, product] });
             }
-          }
-      
-          axios
-            .post("/cart", { barcode })
-            .then((res) => {
-              this.loadCart();
-              console.log(res);
-            })
-            .catch((err) => {
-              Swal.fire("Error!", err.response.data.message, "error");
-            });
+
+            axios
+                .post("/cart", { barcode })
+                .then((res) => {
+                    // this.loadCart();
+                    console.log(res);
+                })
+                .catch((err) => {
+                    Swal.fire("Error!", err.response.data.message, "error");
+                });
         }
-      }
-      
+    }
     
 
     setCustomerId(event) {
@@ -229,13 +233,9 @@ class Cart extends Component {
                                 className="form-control"
                                 onChange={this.setCustomerId}
                             >
-                                <option value="">Walking Customer</option>
-                                {customers.map((cus) => (
-                                    <option
-                                        key={cus.id}
-                                        value={cus.id}
-                                    >{`${cus.first_name} ${cus.last_name}`}</option>
-                                ))}
+                                <option value="cash">Cash</option>
+                                <option value="cashless">Cashless</option>
+                                
                             </select>
                         </div>
                     </div>

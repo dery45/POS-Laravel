@@ -13,7 +13,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div id="info" class="container-fluid">
         <div class="row mb-4">
             <div class="col-2"><input id="daily" class="form-control" type="text" name="" value="Modal Harian : {{config('settings.currency_symbol')}} {{number_format($capitalValue, 2)}}" readonly></div>
             <div class="col-2"><input id="cash" class="form-control" type="text" name="" value="Cash Income : {{config('settings.currency_symbol')}} {{number_format($cashIn, 2)}}" readonly></div>
@@ -21,6 +21,7 @@
             <div class="col-2"><input id="total" class="form-control" type="text" name="" value="Total Income : {{config('settings.currency_symbol')}} {{number_format($pendapatan, 2)}}" readonly></div>
         </div>
     </div>
+    <button id="btnmodal" class="btn btn-primary" style="width: 30%;">Modal Harian</button>
     <div class="modal fade" id="ModalHarian" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -51,13 +52,23 @@
 @endsection
 @section('js')
 <script>
-    if({{$capitalValue}}<1){
-        $(document).ready(function(){
+    $( document ).ready(function() {
+        console.log( "document loaded" );
+        if({{$capitalValue}}<1){
+            $("#ModalHarian").modal('show');
+            $("#info").hide();
+            $("#cart").hide();
+            $("#btnmodal").show();
+        }
+        else{
+            $("#ModalHarian").modal('hide');
+            $("#info").show();
+            $("#cart").show();
+            $("#btnmodal").hide();
+        }
+        $("#btnmodal").on("click", function(){
             $("#ModalHarian").modal('show');
         });
-    }
-    $('#ModalHarian').on('hidden.bs.modal', function () {
-        window.location.replace("{{ route('home') }}");
-    })
+    });
 </script>
 @endsection
