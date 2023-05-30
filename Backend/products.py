@@ -41,6 +41,8 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
+    
+app.json_encoder = CustomJSONEncoder
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -184,6 +186,7 @@ class GetAllProductsResource(Resource):
                 'updated_at': product.updated_at
             })
         return jsonify(result)
+
 
 class GetProductResource(Resource):
     def get(self, product_id):
