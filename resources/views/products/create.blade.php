@@ -12,7 +12,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="name">Nama Produk</label>
                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name"
                     placeholder="Name" value="{{ old('name') }}">
                 @error('name')
@@ -23,7 +23,7 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
+                <label for="description">Deskripsi</label>
                 <textarea name="description" class="form-control @error('description') is-invalid @enderror"
                     id="description" placeholder="Description">{{ old('description') }}</textarea>
                 @error('description')
@@ -34,7 +34,7 @@
             </div>
 
             <div class="form-group">
-                <label for="category_product">Category</label>
+                <label for="category_product">Kategori</label>
                 <select name="category_product" class="form-control @error('category_product') is-invalid @enderror" id="category_product">
                     <option value="">Select Category</option>
                     @foreach($categories as $category)
@@ -49,7 +49,7 @@
             </div>
 
             <div class="form-group">
-                <label for="image">Image</label>
+                <label for="image">Gambar</label>
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" name="image" id="image">
                     <label class="custom-file-label" for="image">Choose file</label>
@@ -85,7 +85,7 @@
             </div>
 
             <div class="form-group">
-                <label for="price">Price</label>
+                <label for="price">Harga</label>
                 <input type="text" name="price" class="form-control @error('price') is-invalid @enderror" id="price"
                     placeholder="Price" value="{{ old('price') }}">
                 @error('price')
@@ -98,7 +98,7 @@
 
 
             <div class="form-group">
-                <label for="minimum_low">Minimum Low</label>
+                <label for="minimum_low">Jumlah minimum harga grosir</label>
                 <input type="text" name="minimum_low" class="form-control @error('minimum_low') is-invalid @enderror"
                     id="minimum_low" placeholder="Minimum Low" value="{{ old('minimum_low') }}">
                 @error('minimum_low')
@@ -110,7 +110,7 @@
 
 
             <div class="form-group">
-                <label for="low_price">Low Price</label>
+                <label for="low_price">Harga grosir</label>
                 <input type="text" name="low_price" class="form-control @error('low_price') is-invalid @enderror"
                     id="low_price" placeholder="Low Price" value="{{ old('low_price') }}">
                 @error('low_price')
@@ -121,7 +121,7 @@
             </div>
 
             <div class="form-group">
-                <label for="stock_price">Stock Price</label>
+                <label for="stock_price">Harga modal</label>
                 <input type="text" name="stock_price" class="form-control @error('stock_price') is-invalid @enderror"
                     id="stock_price" placeholder="Stock Price" value="{{ old('stock_price') }}">
                 @error('stock_price')
@@ -132,7 +132,7 @@
             </div>
 
             <div class="form-group">
-                <label for="quantity">Quantity</label>
+                <label for="quantity">Stok</label>
                 <input type="text" name="quantity" class="form-control @error('quantity') is-invalid @enderror"
                     id="quantity" placeholder="Quantity" value="{{ old('quantity', 1) }}">
                 @error('quantity')
@@ -155,7 +155,7 @@
                 @enderror
             </div>
 
-            <button class="btn btn-primary" type="submit">Create</button>
+            <button class="btn btn-primary" type="submit">Buat Produk</button>
         </form>
     </div>
 </div>
