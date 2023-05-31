@@ -189,11 +189,11 @@ class Cart extends Component {
                             user_id: 1,
                         },
                     };
-
+    
                     this.setState({ cart: [...this.state.cart, product] });
                 }
             }
-
+    
             axios
                 .post("/cart", { barcode })
                 .then((res) => {
@@ -206,6 +206,7 @@ class Cart extends Component {
         }
     }
     
+    
 
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
@@ -216,36 +217,6 @@ class Cart extends Component {
         this.setState({ payment_method: paymentMethod });
     }
 
-    /*handleClickSubmit() {
-        Swal.fire({
-            title: "Received Amount",
-            input: "text",
-            inputValue: this.getTotal(this.state.cart),
-            showCancelButton: true,
-            confirmButtonText: "Send",
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                return axios
-                    .post("/orders", {
-                        customer_id: this.state.customer_id,
-
-                        amount,
-                    })
-                    .then((res) => {
-                        this.loadCart();
-                        return res.data;
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
-        }).then((result) => {
-            if (result.value) {
-                //
-            }
-        });
-    }*/
 
     handleClickSubmit() {
         const totalAmount = this.getTotal(this.state.cart);
@@ -325,6 +296,7 @@ class Cart extends Component {
                             </select>
                         </div>
                     </div>
+                    {/* ...existing code... */}
                     <div className="user-cart">
                         <div className="card">
                             <table className="table table-striped">
@@ -354,16 +326,17 @@ class Cart extends Component {
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() =>
-                                                        this.handleClickDelete(
-                                                            c.id
-                                                        )
+                                                        this.handleClickDelete(c.id)
                                                     }
                                                 >
                                                     <i className="fas fa-trash"></i>
                                                 </button>
                                             </td>
                                             <td className="text-right">
-                                                {window.APP.currency_symbol}{totalAmount}
+                                                {window.APP.currency_symbol}
+                                                {c.pivot.quantity >= c.minimum_low
+                                                    ? (c.pivot.quantity * c.low_price).toFixed(2)
+                                                    : (c.pivot.quantity * c.price).toFixed(2)}
                                             </td>
                                         </tr>
                                     ))}
@@ -371,6 +344,7 @@ class Cart extends Component {
                             </table>
                         </div>
                     </div>
+                    {/* ...existing code... */}
 
                     <div className="row">
                         <div className="col">Total:</div>
