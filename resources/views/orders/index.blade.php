@@ -50,7 +50,14 @@
                     <td>{{config('settings.currency_symbol')}} {{number_format($order->total() - $order->receivedAmount(), 2)}}</td>
                     <td>{{$order->paymentMethod()}}</td>
                     <td>{{$order->created_at}}</td>
-                    <td>action</td>
+                    <td>
+                                <a href="" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i> Detail
+                                </a>
+                                <a href="" class="btn btn-secondary">
+                                    <i class="fas fa-print"></i> Print
+                                </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
