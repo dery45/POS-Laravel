@@ -15,7 +15,7 @@ class Cart extends Component {
             barcode: "",
             search: "",
             customer_id: "",
-            payment_method: "",
+            payment_method: "Cash",
         };
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
@@ -210,10 +210,11 @@ class Cart extends Component {
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
-    setPaymentMethod(event) {
-        this.setState({ payment_method: event.target.value });
-    }
     
+    setPaymentMethod(event) {
+        const paymentMethod = event.target.value;
+        this.setState({ payment_method: paymentMethod });
+    }
 
     /*handleClickSubmit() {
         Swal.fire({
