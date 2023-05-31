@@ -17,6 +17,7 @@ class Cart extends Component {
             customer_id: "",
             payment_method: "",
         };
+        this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
         this.loadCart = this.loadCart.bind(this);
         this.handleOnChangeBarcode = this.handleOnChangeBarcode.bind(this);
@@ -212,6 +213,8 @@ class Cart extends Component {
     setPaymentMethod(event) {
         this.setState({ payment_method: event.target.value });
     }
+    
+
     /*handleClickSubmit() {
         Swal.fire({
             title: "Received Amount",
@@ -245,7 +248,7 @@ class Cart extends Component {
 
     handleClickSubmit() {
         const totalAmount = this.getTotal(this.state.cart);
-        console.log("Total Amount:", totalAmount)
+        console.log("Total Amount:", totalAmount);
         Swal.fire({
             title: "Received Amount",
             input: "text",
@@ -254,21 +257,27 @@ class Cart extends Component {
             confirmButtonText: "Send",
             showLoaderOnConfirm: true,
             preConfirm: (amount) => {
+                const requestData = {
+                    customer_id: this.state.customer_id,
+                    items: this.state.cart.map((c) => {
+                        const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
+                        
+                        return {
+                            product_id: c.id,
+                            quantity: c.pivot.quantity,
+                            payment_method: this.state.payment_method,
+                            amount: totalAmount,
+                        };
+                    }),
+                    amount,
+                };
+                console.log("Payment Method:", this.state.payment_method);
+                console.log("Request Data:", requestData); // Log the request data
+    
                 return axios
-                    .post("/orders", {
-                        customer_id: this.state.customer_id,
-                        payment_method: this.state.payment_method,
-                        items: this.state.cart.map((c) => {
-                            const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
-                            return {
-                                product_id: c.id,
-                                quantity: c.pivot.quantity,
-                                amount: totalAmount,
-                            };
-                        }),
-                        amount,
-                    })
+                    .post("/orders", requestData)
                     .then((res) => {
+                        console.log("Response Data:", res.data);
                         this.loadCart();
                         return res.data;
                     })
@@ -306,10 +315,11 @@ class Cart extends Component {
                             <select
                                 className="form-control"
                                 onChange={this.setPaymentMethod}
+                                defaultValue="Cash"
                             >
                                 <option value="">Select Payment Method</option>
-                                <option value="cash">Cash</option>
-                                <option value="cashless">Cashless</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cashless">Cashless</option>
                                 
                             </select>
                         </div>

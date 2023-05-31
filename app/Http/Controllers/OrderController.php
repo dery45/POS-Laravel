@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -62,10 +63,21 @@ class OrderController extends Controller
 {
     $order = Order::create([
         'customer_id' => $request->customer_id,
-        'payment_method' => $request->payment_method,
         'user_id' => $request->user()->id,
     ]);
 
+    // Iterate through order items and save payment method
+    foreach ($request->items as $item) {
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $item['product_id'],
+            'quantity' => $item['quantity'],
+            'amount' => $item['amount'],
+            'payment_method' => $item['payment_method'],
+        ]);
+    }
+    
+/*
     $cart = $request->user()->cart()->get();
     foreach ($cart as $item) {
         if ($item->pivot->quantity >= $item->minimum_low) {
@@ -75,15 +87,17 @@ class OrderController extends Controller
         }
 
         $order->items()->create([
-            'price' => $price,
+            'amount' => $price,
             'quantity' => $item->pivot->quantity,
             'product_id' => $item->id,
         ]);
 
+        
+
         $item->quantity = $item->quantity - $item->pivot->quantity;
         $item->save();
     }
-
+*/
     $request->user()->cart()->detach();
     $order->payments()->create([
         'amount' => $request->amount,
