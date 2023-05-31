@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Order extends Model
 {
@@ -34,6 +35,8 @@ class Order extends Model
         return 'Working Customer';
     }
 
+
+
     /*
     public function total()
     {
@@ -59,6 +62,24 @@ class Order extends Model
             return $item->product->price * $item->quantity;
         });
     }
+
+
+    public function paymentMethod()
+    {
+        $orderItem = $this->items()->first();
+    
+        if ($orderItem) {
+            return $orderItem->payment_method;
+        }
+    
+        return 'N/A';
+    }
+
+    public function userName()
+    {
+        return $this->belongsTo(User::class, 'user_id')->value('name') ?? 'N/A';
+    }
+
 
     public function formattedTotal()
     {

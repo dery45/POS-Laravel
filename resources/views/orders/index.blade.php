@@ -30,35 +30,27 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Customer Name</th>
+                    <th>Id</th>
+                    <th>Nama Kasir</th>
                     <th>Total</th>
-                    <th>Received Amount</th>
-                    <th>Status</th>
-                    <th>To Pay</th>
-                    <th>Created At</th>
+                    <th>Uang Diterima</th>
+                    <th>Kembalian</th>
+                    <th>Metode</th>
+                    <th>Tgl Transaksi</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($orders as $order)
                 <tr>
                     <td>{{$order->id}}</td>
-                    <td>{{$order->getCustomerName()}}</td>
+                    <td>{{$order->userName()}}</td>
                     <td>{{ config('settings.currency_symbol') }} {{$order->formattedTotal()}}</td>
                     <td>{{ config('settings.currency_symbol') }} {{$order->formattedReceivedAmount()}}</td>
-                    <td>
-                        @if($order->receivedAmount() == 0)
-                            <span class="badge badge-danger">Not Paid</span>
-                        @elseif($order->receivedAmount() < $order->total())
-                            <span class="badge badge-warning">Partial</span>
-                        @elseif($order->receivedAmount() == $order->total())
-                            <span class="badge badge-success">Paid</span>
-                        @elseif($order->receivedAmount() > $order->total())
-                            <span class="badge badge-info">Change</span>
-                        @endif
-                    </td>
                     <td>{{config('settings.currency_symbol')}} {{number_format($order->total() - $order->receivedAmount(), 2)}}</td>
+                    <td>{{$order->paymentMethod()}}</td>
                     <td>{{$order->created_at}}</td>
+                    <td>action</td>
                 </tr>
                 @endforeach
             </tbody>
