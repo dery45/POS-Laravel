@@ -51,12 +51,12 @@
                     <td>{{$order->paymentMethod()}}</td>
                     <td>{{$order->created_at}}</td>
                     <td>
-                                <a href="" class="btn btn-primary">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                                <a href="" class="btn btn-secondary">
-                                    <i class="fas fa-print"></i> Print
-                                </a>
+                        <button class="btn btn-primary btn-order-details" data-order-id="{{ $order->id }}" data-toggle="modal" data-target="#orderDetailsModal">
+                            <i class="fas fa-eye"></i> Detail
+                        </button>
+                        <a href="" class="btn btn-secondary">
+                            <i class="fas fa-print"></i> Print
+                        </a>
                     </td>
                 </tr>
                 @endforeach
@@ -76,5 +76,50 @@
         {{ $orders->render() }}
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Order details will be dynamically loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function() {
+        $('.btn-order-details').on('click', function() {
+            var orderId = $(this).data('order-id');
+
+            // Make an AJAX request to fetch order details
+            $.ajax({
+                url: '/orders/' + orderId + '/details',
+                type: 'GET',
+                dataType: 'html',
+                success: function(response) {
+                    // Update the modal body with the fetched data
+                    $('#orderDetailsModal .modal-body').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+@endsection
