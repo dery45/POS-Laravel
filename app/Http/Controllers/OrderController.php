@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -60,7 +61,7 @@ class OrderController extends Controller
         return 'success';
     }*/
     public function store(OrderStoreRequest $request)
-{
+    {
     $order = Order::create([
         'customer_id' => $request->customer_id,
         'user_id' => $request->user()->id,
@@ -75,8 +76,23 @@ class OrderController extends Controller
             'amount' => $item['amount'],
             'payment_method' => $item['payment_method'],
         ]);
+
+            // Update the item quantity
+            $product = Product::find($item['product_id']);
+            $product->quantity -= $item['quantity'];
+            $product->save();
+        }
+
+    $request->user()->cart()->detach();
+    $order->payments()->create([
+        'amount' => $request->amount,
+        'user_id' => $request->user()->id,
+    ]);
+
+    return 'success';
     }
-    
+    }
+
 /*
     $cart = $request->user()->cart()->get();
     foreach ($cart as $item) {
@@ -98,13 +114,3 @@ class OrderController extends Controller
         $item->save();
     }
 */
-    $request->user()->cart()->detach();
-    $order->payments()->create([
-        'amount' => $request->amount,
-        'user_id' => $request->user()->id,
-    ]);
-
-    return 'success';
-}
-}
-
