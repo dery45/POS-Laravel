@@ -61,6 +61,14 @@ class OrderController extends Controller
         ]);
         return 'success';
     }*/
+
+    public function show($id)
+    {
+        $order = Order::findOrFail($id);
+
+        return view('orders.show', ['order' => $order]);
+    }
+
     public function store(OrderStoreRequest $request)
     {
     $order = Order::create([
@@ -105,10 +113,35 @@ class OrderController extends Controller
     
         return view('orders.details', compact('order'));
     }
+
+    public function uploadProof(Request $request, $id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order not found.');
+        }
+
+        if ($request->hasFile('proof_image')) {
+            $image = $request->file('proof_image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('proof_images'), $imageName);
+
+            $order->proof_image = $imageName;
+            $order->save();
+
+            return redirect()->back()->with('success', 'Proof image uploaded successfully.');
+        }
+
+        return redirect()->back()->with('error', 'No proof image found.');
+    }
+
     
 
 
     }
+
+
 
 /*
     $cart = $request->user()->cart()->get();
