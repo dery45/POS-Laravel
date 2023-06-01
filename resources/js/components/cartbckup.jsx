@@ -12,17 +12,11 @@ class Cart extends Component {
             cart: [],
             products: [],
             customers: [],
-            capitalValue: 0,
-            cashIn: 0,
-            cashlessIn: 0,
-            pendapatan: 0,
             barcode: "",
             search: "",
             customer_id: "",
             payment_method: "Cash",
             showModal: false,
-            selectedProduct: null,
-            minimumLowValue: 0,
         };
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
@@ -46,24 +40,6 @@ class Cart extends Component {
         this.loadCart();
         this.loadProducts();
         this.loadCustomers();
-        this.loadCashData();
-    }
-
-    loadCashData() {
-        axios.get("/cart").then((res) => {
-            const cart = res.data;
-            this.setState({ cart });
-        });
-
-        axios.get("/cart").then((res) => {
-            const { capitalValue, cashIn, cashlessIn, pendapatan } = res.data;
-            this.setState({
-                capitalValue,
-                cashIn,
-                cashlessIn,
-                pendapatan,
-            });
-        });
     }
 
     loadCustomers() {
@@ -101,7 +77,6 @@ class Cart extends Component {
                 return {
                     ...product,
                     minimum_low: product.minimum_low, // tambahkan properti low_price
-                    minimumLowValue: minimum_low,
                 };
             });
             this.setState({ min });
@@ -110,11 +85,10 @@ class Cart extends Component {
 
     handleSubmit = (id) => (event) => {
         event.preventDefault();
-        const nilaiInput = event.target.querySelector('input[name="inputJumlah"]').value;
-        let barang = this.state.cart.find((c) => c.id === id);
+        const nilaiInput = event.target.elements.inputJumlah.value;
         // Gunakan nilaiInput dan id sesuai kebutuhan
-        this.handleChangeQty(barang.id,nilaiInput);
-        this.handleCloseProduct();
+        this.handleChangeQty(id,nilaiInput);
+        this.handleCloseModal();
       };
 
     handleOnChangeBarcode(event) {
@@ -185,15 +159,12 @@ class Cart extends Component {
       };
     
     handleOpenProduct = (barcode) => {
-        const selectedProduct = this.state.products.find((p)=>p.barcode===barcode);
+        this.handleOpenModal();
         this.addProductToCart(barcode);
-        console.log(selectedProduct);
-        if(!!selectedProduct){
-            this.setState({selectedProduct,showModal: true});
-        }
     };
-    handleCloseProduct = () => {
-        this.setState({ selectedProduct: null, showModal: false });
+    handleCloseProduct = (id) => {
+        this.handleCloseModal();
+        this.handleClickDelete(id);
     };
 
     handleClickDelete(product_id) {
@@ -219,7 +190,7 @@ class Cart extends Component {
         }
     }
 
-    addProductToCart(barcode) {
+    addProductToCart(barcode,kuantitas) {
         let product = this.state.products.find((p) => p.barcode === barcode);
         if (!!product) {
             // if product is already in cart
@@ -232,7 +203,7 @@ class Cart extends Component {
                             c.id === product.id &&
                             product.quantity > c.pivot.quantity
                         ) {
-                            c.pivot.quantity = c.pivot.quantity + 1;
+                            c.pivot.quantity = c.pivot.quantity + kuantitas;
                         }
                         return c;
                     }),
@@ -242,7 +213,7 @@ class Cart extends Component {
                     product = {
                         ...product,
                         pivot: {
-                            quantity: 1,
+                            quantity: kuantitas,
                             product_id: product.id,
                             user_id: 1,
                         },
@@ -324,7 +295,7 @@ class Cart extends Component {
       }
     
     render() {
-        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashIn, cashlessIn, pendapatan } = this.state;
+        const { cart, products, customers, barcode,showModal } = this.state;
         const totalAmount = this.getTotal(cart);
         return (
             
@@ -401,7 +372,6 @@ class Cart extends Component {
                                     ))}
                                 </tbody>
                             </table>
-                            
                         </div>
                     </div>
                     {/* ...existing code... */}
@@ -473,12 +443,14 @@ class Cart extends Component {
                     <div className="modal-content">
                         <div className="modal-header">
                         <h5 className="modal-title">Jumlah Product</h5>
-                        <button type="button" className="close" onClick={this.handleCloseProduct}>
+                        <button type="button" className="close" onClick={handleCloseProduct(c.id)}>
                             <span>&times;</span>
                         </button>
                         </div>
+                        {cart.map((c) => (
+                            <div key={c.id}>
                             <form 
-                                onSubmit={this.handleSubmit(selectedProduct.id)}
+                                onSubmit={this.handleSubmit(c.id)}
                                 encType="multipart/form-data"
                                 >
                                 <div className="modal-body">
@@ -490,14 +462,13 @@ class Cart extends Component {
                                             name="inputJumlah"
                                          />
                                     </div>
-                                    <p>Sisa Stok : {selectedProduct.quantity}</p>
                                 </div>
                                 <div className="modal-footer">
                                     <button
                                         
                                         type="button"
                                         className="btn btn-primary"
-                                        onClick={this.handleCloseProduct}
+                                        onClick={() => this.handleCloseProduct(c.id)}
                                     >
                                         Close
                                     </button>
@@ -507,7 +478,9 @@ class Cart extends Component {
                                     </button>
                                 </div>
                             </form>
-                        </div>
+                            </div>
+                            ))}
+                    </div>
                     </div>
                 </div>
                 )}  

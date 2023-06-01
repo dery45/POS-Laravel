@@ -51,6 +51,19 @@ class CartController extends Controller
                 return $i->receivedAmount();
             })->sum()+$capitalValue,
         ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'capitalValue' => $capitalValue,
+                'cashIn' => $cashin,
+                'cashlessIn' => $cashlessin,
+                'pendapatan' => $orders->where('created_at', '>=', date('Y-m-d') . ' 00:00:00')->map(function ($i) {
+                    if ($i->receivedAmount() > $i->total()) {
+                        return $i->total();
+                    }
+                    return $i->receivedAmount();
+                })->sum() + $capitalValue,
+            ]);
+        }
     }
 
     public function store(Request $request)
