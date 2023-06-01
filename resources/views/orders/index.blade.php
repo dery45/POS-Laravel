@@ -3,7 +3,7 @@
 @section('title', 'Orders List')
 @section('content-header', 'Order List')
 @section('content-actions')
-    <a href="{{ route('cart.index') }}" class="btn btn-primary">Open POS</a>
+    <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a>
 @endsection
 
 @section('content')
@@ -97,6 +97,85 @@
     </div>
 </div>
 
+<!-- Modal for Rekap Harian -->
+<div class="modal fade" id="rekapHarianModal" tabindex="-1" role="dialog" aria-labelledby="rekapHarianModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rekapHarianModalLabel">Rekap Harian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('orders.list') }}" method="GET">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <label for="chooseDate">Choose Date</label>
+                            <input type="date" class="form-control" id="chooseDate" name="chosen_date">
+                        </div>
+                        <div class="col-md-5">
+                            <button class="btn btn-outline-primary" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+
+                
+                    
+                    <div class="form-group">
+                        <label for="modalHarian">Modal Harian</label>
+                        <input type="text" class="form-control" id="modalHarian">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalCash">Total Cash</label>
+                        <input type="text" class="form-control" id="totalCash">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalCashless">Total Cashless</label>
+                        <input type="text" class="form-control" id="totalCashless">
+                    </div>
+                    <div class="form-group">
+                        <label for="listTransaksi">List Transaksi</label>
+                        <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nama Kasir</th>
+                            <th>Total</th>
+                            <th>Uang Diterima</th>
+                            <th>Kembalian</th>
+                            <th>Metode</th>
+                            <th>Tgl Transaksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($orders as $order)
+                        <tr>
+                            <td>{{ $order->id }}</td>
+                            <td>{{ $order->userName() }}</td>
+                            <td>{{ config('settings.currency_symbol') }} {{ $order->formattedTotal() }}</td>
+                            <td>{{ config('settings.currency_symbol') }} {{ $order->formattedReceivedAmount() }}</td>
+                            <td>{{ config('settings.currency_symbol') }} {{ number_format($order->total() - $order->receivedAmount(), 2) }}</td>
+                            <td>{{ $order->paymentMethod() }}</td>
+                            <td>{{ $order->created_at }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lihatBuktiCashless">Lihat Bukti Cashless</label>
+                        <input type="text" class="form-control" id="lihatBuktiCashless">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script>
@@ -119,5 +198,74 @@
             });
         });
     });
+
+    $(document).ready(function() {
+    // Handle form submission
+    $('#rekapHarianForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent form submission
+
+        // Get form values
+        var chooseDate = $('#chooseDate').val();
+        var modalHarian = $('#modalHarian').val();
+        var totalCash = calculateTotalCash();
+        var totalCashless = calculateTotalCashless();
+        var listTransaksi = fetchOrderList(chooseDate);
+        var lihatBuktiCashless = "";
+
+        // Update the form fields with calculated values
+        $('#totalCash').val(totalCash);
+        $('#totalCashless').val(totalCashless);
+        $('#listTransaksi').val(listTransaksi);
+        $('#lihatBuktiCashless').val(lihatBuktiCashless);
+
+        // Close the modal
+        $('#rekapHarianModal').modal('hide');
+    });
+
+    // Calculate the total cash by summing up the cash payments and the daily capital
+    function calculateTotalCash() {
+        var cashPayments = parseFloat('{{ $orders->where("payment_method", "cash")->sum("receivedAmount") }}');
+        var dailyCapital = parseFloat($('#modalHarian').val());
+        var totalCash = cashPayments + dailyCapital;
+        return totalCash.toFixed(2);
+    }
+
+    // Calculate the total cashless by summing up the cashless payments
+    function calculateTotalCashless() {
+        var cashlessPayments = parseFloat('{{ $orders->where("payment_method", "cashless")->sum("receivedAmount") }}');
+        return cashlessPayments.toFixed(2);
+    }
+
+    // Fetch the order list for the chosen date
+    function fetchOrderList(date) {
+        // Make an AJAX request to fetch the order list
+        var orderList = [];
+        $.ajax({
+            url: '{{ route("orders.list") }}',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                date: date
+            },
+            async: false,
+            success: function(response) {
+                orderList = response;
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+        // Format the order list as a string
+        var formattedOrderList = "";
+        for (var i = 0; i < orderList.length; i++) {
+            var order = orderList[i];
+            formattedOrderList += "ID: " + order.id + ", Nama Kasir: " + order.userName + ", Total: " + order.totalFormatted + "\n";
+        }
+
+        return formattedOrderList;
+    }
+});
+
 </script>
 @endsection

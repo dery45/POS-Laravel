@@ -26,6 +26,7 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::delete('/cart/empty', [CartController::class, 'empty']);
     Route::resource('orders', OrderController::class)->only(['index', 'show', 'create', 'store']);
     Route::get('/orders/{id}/details', [OrderController::class, 'details'])->name('orders.details');
+    Route::get('/orders/list', [OrderController::class, 'getOrderList'])->name('orders.list');
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {

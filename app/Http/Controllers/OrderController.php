@@ -61,6 +61,14 @@ class OrderController extends Controller
         ]);
         return 'success';
     }*/
+
+    public function show($id)
+    {
+        $order = Order::findOrFail($id);
+
+        return view('orders.show', ['order' => $order]);
+    }
+
     public function store(OrderStoreRequest $request)
     {
     $order = Order::create([
@@ -109,6 +117,8 @@ class OrderController extends Controller
 
 
     }
+
+
 
 /*
     $cart = $request->user()->cart()->get();
