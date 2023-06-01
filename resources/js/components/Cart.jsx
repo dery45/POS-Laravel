@@ -111,7 +111,7 @@ class Cart extends Component {
     handleChangeQty(product_id, qty) {
         const cart = this.state.cart.map((c) => {
             if (c.id === product_id) {
-                c.pivot.quantity = qty;
+                c.pivot.quantity = parseInt(qty, 10);
             }
             return c;
         });
@@ -121,7 +121,9 @@ class Cart extends Component {
 
         axios
             .post("/cart/change-qty", { product_id, quantity: qty })
-            .then((res) => {})
+            .then((res) => {
+                this.loadCart();
+            })
             .catch((err) => {
                 Swal.fire("Error!", err.response.data.message, "error");
             });
@@ -170,15 +172,17 @@ class Cart extends Component {
                 // update quantity
                 this.setState({
                     cart: this.state.cart.map((c) => {
-                        if (
-                            c.id === product.id &&
-                            product.quantity > c.pivot.quantity
-                        ) {
-                            c.pivot.quantity = c.pivot.quantity + 1;
-                        }
-                        return c;
+                        if (c.id === product.id) {
+                            c.pivot.quantity += 1; // Menambahkan 1 pada kuantitas produk yang sudah ada di keranjang
+                          }
+                          return c;
                     }),
-                });
+                },
+                () => {
+                    this.loadCart(); // Tambahkan pemanggilan loadCart() di sini setelah pembaruan keranjang
+                  }
+                );
+                
             } else {
                 if (product.quantity > 0) {
                     product = {
@@ -190,14 +194,18 @@ class Cart extends Component {
                         },
                     };
     
-                    this.setState({ cart: [...this.state.cart, product] });
+                    this.setState({ cart: [...this.state.cart, product] },
+                        () => {
+                            this.loadCart(); // Tambahkan pemanggilan loadCart() di sini setelah pembaruan keranjang
+                          }
+                        );
                 }
             }
     
             axios
                 .post("/cart", { barcode })
                 .then((res) => {
-                    // this.loadCart();
+                    //this.loadCart();
                     console.log(res);
                 })
                 .catch((err) => {

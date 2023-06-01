@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\DailyCapital;
+use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -19,8 +20,20 @@ class CartController extends Controller
 
         $capitalValue = $dailyCapital ? $dailyCapital->capital : 0;
 
-        $cashin=0;
-        $cashlessin=0;
+        $cashin=Payment::whereDate('created_at', $today)
+                ->whereIn('order_id', function ($query) {
+                    $query->select('id')
+                        ->from('order_items')
+                        ->where('payment_method', 'cash');
+                })
+                ->sum('amount');
+        $cashlessin=Payment::whereDate('created_at', $today)
+                ->whereIn('order_id', function ($query) {
+                    $query->select('id')
+                        ->from('order_items')
+                        ->where('payment_method', 'cashless');
+                })
+                ->sum('amount');
 
         if ($request->wantsJson()) {
             return response(
@@ -28,16 +41,15 @@ class CartController extends Controller
             );
         }
         return view('cart.index',[
+            'capitalValue' => $capitalValue,
+            'cashIn'=>$cashin,
+            'cashlessIn'=>$cashlessin,
             'pendapatan' => $orders->where('created_at', '>=', date('Y-m-d').' 00:00:00')->map(function($i) {
                 if($i->receivedAmount() > $i->total()) {
                     return $i->total();
                 }
                 return $i->receivedAmount();
-            })->sum(),
-            
-            'capitalValue' => $capitalValue,
-            'cashIn'=>$cashin,
-            'cashlessIn'=>$cashlessin,
+            })->sum()+$capitalValue,
         ]);
     }
 
