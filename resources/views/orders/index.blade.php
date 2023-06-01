@@ -3,7 +3,7 @@
 @section('title', 'Orders List')
 @section('content-header', 'Order List')
 @section('content-actions')
-    <a href="{{route('cart.index')}}" class="btn btn-primary">Open POS</a>
+    <a href="{{ route('cart.index') }}" class="btn btn-primary">Open POS</a>
 @endsection
 
 @section('content')
@@ -12,13 +12,13 @@
         <div class="row">
             <div class="col-md-7"></div>
             <div class="col-md-5">
-                <form action="{{route('orders.index')}}">
+                <form action="{{ route('orders.index') }}">
                     <div class="row">
                         <div class="col-md-5">
-                            <input type="date" name="start_date" class="form-control" value="{{request('start_date')}}" />
+                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" />
                         </div>
                         <div class="col-md-5">
-                            <input type="date" name="end_date" class="form-control" value="{{request('end_date')}}" />
+                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" />
                         </div>
                         <div class="col-md-2">
                             <button class="btn btn-outline-primary" type="submit">Submit</button>
@@ -43,18 +43,18 @@
             <tbody>
                 @foreach ($orders as $order)
                 <tr>
-                    <td>{{$order->id}}</td>
-                    <td>{{$order->userName()}}</td>
-                    <td>{{ config('settings.currency_symbol') }} {{$order->formattedTotal()}}</td>
-                    <td>{{ config('settings.currency_symbol') }} {{$order->formattedReceivedAmount()}}</td>
-                    <td>{{config('settings.currency_symbol')}} {{number_format($order->total() - $order->receivedAmount(), 2)}}</td>
-                    <td>{{$order->paymentMethod()}}</td>
-                    <td>{{$order->created_at}}</td>
+                    <td>{{ $order->id }}</td>
+                    <td>{{ $order->userName() }}</td>
+                    <td>{{ config('settings.currency_symbol') }} {{ $order->formattedTotal() }}</td>
+                    <td>{{ config('settings.currency_symbol') }} {{ $order->formattedReceivedAmount() }}</td>
+                    <td>{{ config('settings.currency_symbol') }} {{ number_format($order->total() - $order->receivedAmount(), 2) }}</td>
+                    <td>{{ $order->paymentMethod() }}</td>
+                    <td>{{ $order->created_at }}</td>
                     <td>
                         <button class="btn btn-primary btn-order-details" data-order-id="{{ $order->id }}" data-toggle="modal" data-target="#orderDetailsModal">
                             <i class="fas fa-eye"></i> Detail
                         </button>
-                        <a href="" class="btn btn-secondary">
+                        <a href="#" class="btn btn-secondary">
                             <i class="fas fa-print"></i> Print
                         </a>
                     </td>
@@ -79,7 +79,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
@@ -97,9 +97,7 @@
     </div>
 </div>
 
-@endsection
 
-@section('scripts')
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function() {
@@ -108,7 +106,7 @@
 
             // Make an AJAX request to fetch order details
             $.ajax({
-                url: '/orders/' + orderId + '/details',
+                url: '{{ route("orders.details", ":id") }}'.replace(':id', orderId),
                 type: 'GET',
                 dataType: 'html',
                 success: function(response) {

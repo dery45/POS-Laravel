@@ -93,12 +93,19 @@ class OrderController extends Controller
     return 'success';
     }
 
-    public function details($id)
+    public function details(Request $request)
     {
-        $order = Order::findOrFail($id);
-
+        $orderId = $request->route('id');
+    
+        $order = Order::find($orderId);
+    
+        if ($order === null) {
+            return redirect()->back()->with('error', 'Order not found.');
+        }
+    
         return view('orders.details', compact('order'));
     }
+    
 
 
     }
