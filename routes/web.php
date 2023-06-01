@@ -26,7 +26,11 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::delete('/cart/empty', [CartController::class, 'empty']);
     Route::resource('orders', OrderController::class)->only(['index', 'show', 'create', 'store']);
     Route::get('/orders/{id}/details', [OrderController::class, 'details'])->name('orders.details');
+<<<<<<< HEAD
     Route::get('/orders/list', [OrderController::class, 'getOrderList'])->name('orders.list');
+=======
+    Route::post('/orders/{id}/upload-proof', [OrderController::class, 'uploadProof'])->name('orders.uploadProof');
+>>>>>>> 70f7d57e6728aab3f9b57e5a9be86ebf398c1dcb
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {
