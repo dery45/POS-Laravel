@@ -16,9 +16,12 @@ class Cart extends Component {
             search: "",
             customer_id: "",
             payment_method: "Cash",
+            showModal: false,
         };
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
         this.loadCart = this.loadCart.bind(this);
         this.handleOnChangeBarcode = this.handleOnChangeBarcode.bind(this);
         this.handleScanBarcode = this.handleScanBarcode.bind(this);
@@ -80,6 +83,14 @@ class Cart extends Component {
         });
     }
 
+    handleSubmit = (id) => (event) => {
+        event.preventDefault();
+        const nilaiInput = event.target.elements.inputJumlah.value;
+        // Gunakan nilaiInput dan id sesuai kebutuhan
+        this.handleChangeQty(id,nilaiInput);
+        this.handleCloseModal();
+      };
+
     handleOnChangeBarcode(event) {
         const barcode = event.target.value;
         console.log(barcode);
@@ -111,7 +122,7 @@ class Cart extends Component {
     handleChangeQty(product_id, qty) {
         const cart = this.state.cart.map((c) => {
             if (c.id === product_id) {
-                c.pivot.quantity = parseInt(qty, 10);
+                c.pivot.quantity = qty;
             }
             return c;
         });
@@ -121,9 +132,7 @@ class Cart extends Component {
 
         axios
             .post("/cart/change-qty", { product_id, quantity: qty })
-            .then((res) => {
-                this.loadCart();
-            })
+            .then((res) => {})
             .catch((err) => {
                 Swal.fire("Error!", err.response.data.message, "error");
             });
@@ -140,6 +149,24 @@ class Cart extends Component {
     
         return sum(total).toFixed(2);
     }
+
+    handleOpenModal = () => {
+        this.setState({ showModal: true, });
+      };
+
+    handleCloseModal = () => {
+        this.setState({ showModal: false, });
+      };
+    
+    handleOpenProduct = (barcode) => {
+        this.handleOpenModal();
+        this.addProductToCart(barcode);
+    };
+    handleCloseProduct = (id) => {
+        this.handleCloseModal();
+        this.handleClickDelete(id);
+    };
+
     handleClickDelete(product_id) {
         axios
             .post("/cart/delete", { product_id, _method: "DELETE" })
@@ -172,17 +199,15 @@ class Cart extends Component {
                 // update quantity
                 this.setState({
                     cart: this.state.cart.map((c) => {
-                        if (c.id === product.id) {
-                            c.pivot.quantity += 1; // Menambahkan 1 pada kuantitas produk yang sudah ada di keranjang
-                          }
-                          return c;
+                        if (
+                            c.id === product.id &&
+                            product.quantity > c.pivot.quantity
+                        ) {
+                            c.pivot.quantity = c.pivot.quantity + 1;
+                        }
+                        return c;
                     }),
-                },
-                () => {
-                    this.loadCart(); // Tambahkan pemanggilan loadCart() di sini setelah pembaruan keranjang
-                  }
-                );
-                
+                });
             } else {
                 if (product.quantity > 0) {
                     product = {
@@ -194,18 +219,14 @@ class Cart extends Component {
                         },
                     };
     
-                    this.setState({ cart: [...this.state.cart, product] },
-                        () => {
-                            this.loadCart(); // Tambahkan pemanggilan loadCart() di sini setelah pembaruan keranjang
-                          }
-                        );
+                    this.setState({ cart: [...this.state.cart, product] });
                 }
             }
     
             axios
                 .post("/cart", { barcode })
                 .then((res) => {
-                    //this.loadCart();
+                    this.loadCart();
                     console.log(res);
                 })
                 .catch((err) => {
@@ -227,56 +248,57 @@ class Cart extends Component {
 
 
     handleClickSubmit() {
+        const { customer_id, cart, payment_method } = this.state;
         const totalAmount = this.getTotal(this.state.cart);
-        console.log("Total Amount:", totalAmount);
+      
         Swal.fire({
-            title: "Received Amount",
-            input: "text",
-            inputValue: this.getTotal(this.state.cart),
-            showCancelButton: true,
-            confirmButtonText: "Send",
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                const requestData = {
-                    customer_id: this.state.customer_id,
-                    items: this.state.cart.map((c) => {
-                        const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
-                        
-                        return {
-                            product_id: c.id,
-                            quantity: c.pivot.quantity,
-                            payment_method: this.state.payment_method,
-                            amount: totalAmount,
-                        };
-                    }),
-                    amount,
+          title: "Received Amount",
+          input: "text",
+          inputValue: totalAmount,
+          showCancelButton: true,
+          confirmButtonText: "Send",
+          showLoaderOnConfirm: true,
+          preConfirm: (amount) => {
+            const requestData = {
+              customer_id,
+              items: cart.map((c) => {
+                const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
+                const itemAmount = (c.pivot.quantity * price).toFixed(2);
+                
+                return {
+                  product_id: c.id,
+                  quantity: c.pivot.quantity,
+                  payment_method,
+                  amount: itemAmount,
                 };
-                console.log("Payment Method:", this.state.payment_method);
-                console.log("Request Data:", requestData); // Log the request data
-    
-                return axios
-                    .post("/orders", requestData)
-                    .then((res) => {
-                        console.log("Response Data:", res.data);
-                        this.loadCart();
-                        return res.data;
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
+              }),
+              amount: totalAmount,
+            };
+            
+            return axios
+              .post("/orders", requestData)
+              .then((res) => {
+                console.log("Response Data:", res.data);
+                this.loadCart();
+                return res.data;
+              })
+              .catch((err) => {
+                Swal.showValidationMessage(err.response.data.message);
+              });
+          },
+          allowOutsideClick: () => !Swal.isLoading(),
         }).then((result) => {
-            if (result.value) {
-                //
-            }
+          if (result.value) {
+            // Handle success case
+          }
         });
-    }
+      }
     
     render() {
-        const { cart, products, customers, barcode } = this.state;
+        const { cart, products, customers, barcode,showModal } = this.state;
         const totalAmount = this.getTotal(cart);
         return (
+            
             <div className="row">
                 <div className="col-md-6 col-lg-4">
                     <div className="row mb-2">
@@ -353,7 +375,6 @@ class Cart extends Component {
                         </div>
                     </div>
                     {/* ...existing code... */}
-
                     <div className="row">
                         <div className="col">Total:</div>
                         <div className="col text-right">
@@ -396,7 +417,7 @@ class Cart extends Component {
                     <div className="order-product">
                         {products.map((p) => (
                             <div
-                                onClick={() => this.addProductToCart(p.barcode)}
+                                onClick={() => this.handleOpenProduct(p.barcode)}
                                 key={p.id}
                                 className="item"
                             >
@@ -414,6 +435,53 @@ class Cart extends Component {
                         ))}
                     </div>
                 </div>
+
+                {/* Modal Popup */}
+                {showModal && (
+                  <div className="modal fade show" tabIndex="-1" role="dialog" style={{ display: "block" }}>
+                    <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                        <h5 className="modal-title">Jumlah Product</h5>
+                        <button type="button" className="close" onClick={this.handleCloseModal}>
+                            <span>&times;</span>
+                        </button>
+                        </div>
+                        {cart.map((c) => (
+                            <form 
+                                onSubmit={this.handleSubmit(c.id)}
+                                key={c.id}
+                                encType="multipart/form-data"
+                                >
+                                <div className="modal-body">
+                                    <div className="form-group">
+                                        <label>Input Jumlah Produk :</label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="inputJumlah"
+                                         />
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => this.handleCloseProduct(c.id)}
+                                    >
+                                        Close
+                                    </button>
+                                
+                                    <button type="submit" className="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>))}
+                    </div>
+                    </div>
+                </div>
+                )}  
             </div>
         );
     }
