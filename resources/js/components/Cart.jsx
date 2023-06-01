@@ -281,11 +281,12 @@ class Cart extends Component {
         const totalAmount = this.getTotal(this.state.cart);
       
         Swal.fire({
-          title: "Received Amount",
+          title: "Uang Diterima",
           input: "text",
           inputValue: totalAmount,
           showCancelButton: true,
-          confirmButtonText: "Send",
+          cancelButtonText: "Batal",
+          confirmButtonText: "Simpan",
           showLoaderOnConfirm: true,
           preConfirm: (amount) => {
             const requestData = {
