@@ -92,6 +92,15 @@ class OrderController extends Controller
 
     return 'success';
     }
+
+    public function details($id)
+    {
+        $order = Order::findOrFail($id);
+
+        return view('orders.details', compact('order'));
+    }
+
+
     }
 
 /*
