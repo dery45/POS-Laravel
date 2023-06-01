@@ -12,11 +12,22 @@ class Cart extends Component {
             cart: [],
             products: [],
             customers: [],
+            capitalValue: 0,
+            cashIn: 0,
+            cashlessIn: 0,
+            pendapatan: 0,
             barcode: "",
             search: "",
             customer_id: "",
+            payment_method: "Cash",
+            showModal: false,
+            selectedProduct: null,
+            minimumLowValue: 0,
         };
+        this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
         this.loadCart = this.loadCart.bind(this);
         this.handleOnChangeBarcode = this.handleOnChangeBarcode.bind(this);
         this.handleScanBarcode = this.handleScanBarcode.bind(this);
@@ -35,6 +46,24 @@ class Cart extends Component {
         this.loadCart();
         this.loadProducts();
         this.loadCustomers();
+        this.loadCashData();
+    }
+
+    loadCashData() {
+        axios.get("/cart").then((res) => {
+            const cart = res.data;
+            this.setState({ cart });
+        });
+
+        axios.get("/cart").then((res) => {
+            const { capitalValue, cashIn, cashlessIn, pendapatan } = res.data;
+            this.setState({
+                capitalValue,
+                cashIn,
+                cashlessIn,
+                pendapatan,
+            });
+        });
     }
 
     loadCustomers() {
@@ -51,6 +80,42 @@ class Cart extends Component {
             this.setState({ products });
         });
     }
+
+    loadProduk(search = "") {
+        const que = !!search ? `?search=${search}` : "";
+        axios.get(`/products${que}`).then((res) => {
+            const produk = res.data.data.map((product) => {
+                return {
+                    ...product,
+                    low_price: product.low_price, // tambahkan properti low_price
+                };
+            });
+            this.setState({ produk });
+        });
+    }
+
+    loadMin(search = "") {
+        const que = !!search ? `?search=${search}` : "";
+        axios.get(`/products${que}`).then((res) => {
+            const min = res.data.data.map((product) => {
+                return {
+                    ...product,
+                    minimum_low: product.minimum_low, // tambahkan properti low_price
+                    minimumLowValue: minimum_low,
+                };
+            });
+            this.setState({ min });
+        });
+    }
+
+    handleSubmit = (id) => (event) => {
+        event.preventDefault();
+        const nilaiInput = event.target.querySelector('input[name="inputJumlah"]').value;
+        let barang = this.state.cart.find((c) => c.id === id);
+        // Gunakan nilaiInput dan id sesuai kebutuhan
+        this.handleChangeQty(barang.id,nilaiInput);
+        this.handleCloseProduct();
+      };
 
     handleOnChangeBarcode(event) {
         const barcode = event.target.value;
@@ -100,16 +165,37 @@ class Cart extends Component {
     }
 
     getTotal(cart) {
-        const grosir=5000;
-        //if(c.pivot.quantity>=50){
-        //    const total = cart.map((c) => c.pivot.quantity * grosir);
-        //}
-        //else{
-            const total = cart.map((c) => c.pivot.quantity * c.price);
-        //}
-        
+        const total = cart.map((c) => {
+            if (c.pivot.quantity >= c.minimum_low) {
+                return c.pivot.quantity * c.low_price;
+            } else {
+                return c.pivot.quantity * c.price;
+            }
+        });
+    
         return sum(total).toFixed(2);
     }
+
+    handleOpenModal = () => {
+        this.setState({ showModal: true, });
+      };
+
+    handleCloseModal = () => {
+        this.setState({ showModal: false, });
+      };
+    
+    handleOpenProduct = (barcode) => {
+        const selectedProduct = this.state.products.find((p)=>p.barcode===barcode);
+        this.addProductToCart(barcode);
+        console.log(selectedProduct);
+        if(!!selectedProduct){
+            this.setState({selectedProduct,showModal: true});
+        }
+    };
+    handleCloseProduct = () => {
+        this.setState({ selectedProduct: null, showModal: false });
+    };
+
     handleClickDelete(product_id) {
         axios
             .post("/cart/delete", { product_id, _method: "DELETE" })
@@ -161,15 +247,15 @@ class Cart extends Component {
                             user_id: 1,
                         },
                     };
-
+    
                     this.setState({ cart: [...this.state.cart, product] });
                 }
             }
-
+    
             axios
                 .post("/cart", { barcode })
                 .then((res) => {
-                    // this.loadCart();
+                    this.loadCart();
                     console.log(res);
                 })
                 .catch((err) => {
@@ -178,42 +264,71 @@ class Cart extends Component {
         }
     }
     
+    
 
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
-    handleClickSubmit() {
-        Swal.fire({
-            title: "Received Amount",
-            input: "text",
-            inputValue: this.getTotal(this.state.cart),
-            showCancelButton: true,
-            confirmButtonText: "Send",
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                return axios
-                    .post("/orders", {
-                        customer_id: this.state.customer_id,
-                        amount,
-                    })
-                    .then((res) => {
-                        this.loadCart();
-                        return res.data;
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
-        }).then((result) => {
-            if (result.value) {
-                //
-            }
-        });
+    
+    setPaymentMethod(event) {
+        const paymentMethod = event.target.value;
+        this.setState({ payment_method: paymentMethod });
     }
+
+
+    handleClickSubmit() {
+        const { customer_id, cart, payment_method } = this.state;
+        const totalAmount = this.getTotal(this.state.cart);
+      
+        Swal.fire({
+          title: "Uang Diterima",
+          input: "text",
+          inputValue: totalAmount,
+          showCancelButton: true,
+          cancelButtonText: "Batal",
+          confirmButtonText: "Simpan",
+          showLoaderOnConfirm: true,
+          preConfirm: (amount) => {
+            const requestData = {
+              customer_id,
+              items: cart.map((c) => {
+                const price = c.pivot.quantity >= c.minimum_low ? c.low_price : c.price;
+                const itemAmount = (c.pivot.quantity * price).toFixed(2);
+                
+                return {
+                  product_id: c.id,
+                  quantity: c.pivot.quantity,
+                  payment_method,
+                  amount: itemAmount,
+                };
+              }),
+              amount: totalAmount,
+            };
+            
+            return axios
+              .post("/orders", requestData)
+              .then((res) => {
+                console.log("Response Data:", res.data);
+                this.loadCart();
+                return res.data;
+              })
+              .catch((err) => {
+                Swal.showValidationMessage(err.response.data.message);
+              });
+          },
+          allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+          if (result.value) {
+            // Handle success case
+          }
+        });
+      }
+    
     render() {
-        const { cart, products, customers, barcode } = this.state;
+        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashIn, cashlessIn, pendapatan } = this.state;
+        const totalAmount = this.getTotal(cart);
         return (
+            
             <div className="row">
                 <div className="col-md-6 col-lg-4">
                     <div className="row mb-2">
@@ -231,22 +346,25 @@ class Cart extends Component {
                         <div className="col">
                             <select
                                 className="form-control"
-                                onChange={this.setCustomerId}
+                                onChange={this.setPaymentMethod}
+                                defaultValue="Cash"
                             >
-                                <option value="cash">Cash</option>
-                                <option value="cashless">Cashless</option>
+                                <option value="">Pilih metode pembayaran</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cashless">Cashless</option>
                                 
                             </select>
                         </div>
                     </div>
+                    {/* ...existing code... */}
                     <div className="user-cart">
                         <div className="card">
                             <table className="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Product Name</th>
-                                        <th>Quantity</th>
-                                        <th className="text-right">Price</th>
+                                        <th>Produk</th>
+                                        <th>Jumlah</th>
+                                        <th className="text-right">Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -268,27 +386,26 @@ class Cart extends Component {
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() =>
-                                                        this.handleClickDelete(
-                                                            c.id
-                                                        )
+                                                        this.handleClickDelete(c.id)
                                                     }
                                                 >
                                                     <i className="fas fa-trash"></i>
                                                 </button>
                                             </td>
                                             <td className="text-right">
-                                                {window.APP.currency_symbol}{" "}
-                                                {(
-                                                    c.price * c.pivot.quantity
-                                                ).toFixed(2)}
+                                                {window.APP.currency_symbol}
+                                                {c.pivot.quantity >= c.minimum_low
+                                                    ? (c.pivot.quantity * c.low_price).toFixed(2)
+                                                    : (c.pivot.quantity * c.price).toFixed(2)}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
+                            
                         </div>
                     </div>
-
+                    {/* ...existing code... */}
                     <div className="row">
                         <div className="col">Total:</div>
                         <div className="col text-right">
@@ -303,7 +420,7 @@ class Cart extends Component {
                                 onClick={this.handleEmptyCart}
                                 disabled={!cart.length}
                             >
-                                Cancel
+                                Batal
                             </button>
                         </div>
                         <div className="col">
@@ -313,7 +430,7 @@ class Cart extends Component {
                                 disabled={!cart.length}
                                 onClick={this.handleClickSubmit}
                             >
-                                Submit
+                                Simpan
                             </button>
                         </div>
                     </div>
@@ -323,7 +440,7 @@ class Cart extends Component {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Search Product..."
+                            placeholder="Cari Produk.."
                             onChange={this.handleChangeSearch}
                             onKeyDown={this.handleSeach}
                         />
@@ -331,7 +448,7 @@ class Cart extends Component {
                     <div className="order-product">
                         {products.map((p) => (
                             <div
-                                onClick={() => this.addProductToCart(p.barcode)}
+                                onClick={() => this.handleOpenProduct(p.barcode)}
                                 key={p.id}
                                 className="item"
                             >
@@ -349,6 +466,52 @@ class Cart extends Component {
                         ))}
                     </div>
                 </div>
+
+                {/* Modal Popup */}
+                {showModal && (
+                  <div className="modal fade show" tabIndex="-1" role="dialog" style={{ display: "block" }}>
+                    <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                        <h5 className="modal-title">Jumlah Product</h5>
+                        <button type="button" className="close" onClick={this.handleCloseProduct}>
+                            <span>&times;</span>
+                        </button>
+                        </div>
+                            <form 
+                                onSubmit={this.handleSubmit(selectedProduct.id)}
+                                encType="multipart/form-data"
+                                >
+                                <div className="modal-body">
+                                    <div className="form-group">
+                                        <label>Input Jumlah Produk :</label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="inputJumlah"
+                                         />
+                                    </div>
+                                    <p>Sisa Stok : {selectedProduct.quantity}</p>
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={this.handleCloseProduct}
+                                    >
+                                        Close
+                                    </button>
+                                
+                                    <button type="submit" className="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                )}  
             </div>
         );
     }

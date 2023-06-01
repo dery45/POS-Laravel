@@ -16,9 +16,9 @@
     <div id="info" class="container-fluid">
         <div class="row mb-4">
             <div class="col-2"><input id="daily" class="form-control" type="text" name="" value="Modal Harian : {{config('settings.currency_symbol')}} {{number_format($capitalValue, 2)}}" readonly></div>
-            <div class="col-2"><input id="cash" class="form-control" type="text" name="" value="Cash Income : {{config('settings.currency_symbol')}} {{number_format($cashIn, 2)}}" readonly></div>
-            <div class="col-2"><input id="cashless" class="form-control" type="text" name="" value="Cahsless Income : {{config('settings.currency_symbol')}} {{number_format($cashlessIn, 2)}}" readonly></div>
-            <div class="col-2"><input id="total" class="form-control" type="text" name="" value="Total Income : {{config('settings.currency_symbol')}} {{number_format($pendapatan, 2)}}" readonly></div>
+            <div class="col-2"><input id="cash" class="form-control" type="text" name="" value="Uang Cash : {{config('settings.currency_symbol')}} {{number_format($cashIn, 2)}}" readonly></div>
+            <div class="col-2"><input id="cashless" class="form-control" type="text" name="" value="Uang Cashless : {{config('settings.currency_symbol')}} {{number_format($cashlessIn, 2)}}" readonly></div>
+            <div class="col-2"><input id="total" class="form-control" type="text" name="" value="Total : {{config('settings.currency_symbol')}} {{number_format($pendapatan, 2)}}" readonly></div>
         </div>
     </div>
     <button id="btnmodal" class="btn btn-primary" style="width: 30%;">Modal Harian</button>
@@ -41,8 +41,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Order extends Model
 {
     protected $fillable = [
         'customer_id',
-        'user_id'
+        'user_id',
+        'proof_image',
     ];
 
     public function items()
@@ -34,12 +36,51 @@ class Order extends Model
         return 'Working Customer';
     }
 
+
+
+    /*
     public function total()
     {
         return $this->items->map(function ($i){
             return $i->price;
         })->sum();
     }
+    */
+    /*
+    public function total()
+    {
+        return $this->items->sum(function ($item) {
+            return $item->product->price * $item->quantity;
+        });
+    }
+    */
+    public function total()
+    {
+        return $this->items->sum(function ($item) {
+            if ($item->quantity >= $item->product->minimum_low) {
+                return $item->product->low_price * $item->quantity;
+            }
+            return $item->product->price * $item->quantity;
+        });
+    }
+
+
+    public function paymentMethod()
+    {
+        $orderItem = $this->items()->first();
+    
+        if ($orderItem) {
+            return $orderItem->payment_method;
+        }
+    
+        return 'N/A';
+    }
+
+    public function userName()
+    {
+        return $this->belongsTo(User::class, 'user_id')->value('name') ?? 'N/A';
+    }
+
 
     public function formattedTotal()
     {

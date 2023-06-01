@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Update Users')
-@section('content-header', 'Update Users')
+@section('title', 'Edit User')
+@section('content-header', 'Edit User')
 
 @section('content')
     <div class="card">
@@ -27,7 +27,7 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" class="form-control">
-                    <small class="form-text text-muted">Leave blank if you don't want to change the password.</small>
+                    <small class="form-text text-muted">Biarkan kosong apabila tidak ada perubahan</small>
                 </div>
                 <div class="form-group">
                     <label for="role">Role</label>
@@ -42,10 +42,10 @@
                     <input type="text" name="address" id="address" class="form-control" value="{{ $user->address }}">
                 </div>
                 <div class="form-group">
-                    <label for="phone_number">Phone Number</label>
+                    <label for="phone_number">Nomor Handphone</label>
                     <input type="text" name="phone_number" id="phone_number" class="form-control" value="{{ $user->phone_number }}">
                 </div>
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </form>
         </div>
     </div>
