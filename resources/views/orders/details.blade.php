@@ -41,7 +41,7 @@
                         <td>{{ $item->product->name }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ $item->payment_method }}</td>
-                        <td>{{ $item->amount }}</td>
+                        <td>{{ config('settings.currency_symbol') }} {{ $item->amount }}</td>
                     </tr>
                 @endforeach
             </tbody>
