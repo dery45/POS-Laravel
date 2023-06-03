@@ -3,7 +3,7 @@
 @section('title', 'Orders List')
 @section('content-header', 'Order List')
 @section('content-actions')
-    <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a>
+    <!-- <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a> -->
 @endsection
 
 @section('content')
