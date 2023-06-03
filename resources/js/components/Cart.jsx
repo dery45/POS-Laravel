@@ -281,11 +281,12 @@ class Cart extends Component {
         const totalAmount = this.getTotal(this.state.cart);
       
         Swal.fire({
-          title: "Received Amount",
+          title: "Uang Diterima",
           input: "text",
           inputValue: totalAmount,
           showCancelButton: true,
-          confirmButtonText: "Send",
+          cancelButtonText: "Batal",
+          confirmButtonText: "Simpan",
           showLoaderOnConfirm: true,
           preConfirm: (amount) => {
             const requestData = {
@@ -348,7 +349,7 @@ class Cart extends Component {
                                 onChange={this.setPaymentMethod}
                                 defaultValue="Cash"
                             >
-                                <option value="">Select Payment Method</option>
+                                <option value="">Pilih metode pembayaran</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Cashless">Cashless</option>
                                 
@@ -361,9 +362,9 @@ class Cart extends Component {
                             <table className="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Product Name</th>
-                                        <th>Quantity</th>
-                                        <th className="text-right">Price</th>
+                                        <th>Produk</th>
+                                        <th>Jumlah</th>
+                                        <th className="text-right">Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -419,7 +420,7 @@ class Cart extends Component {
                                 onClick={this.handleEmptyCart}
                                 disabled={!cart.length}
                             >
-                                Cancel
+                                Batal
                             </button>
                         </div>
                         <div className="col">
@@ -429,7 +430,7 @@ class Cart extends Component {
                                 disabled={!cart.length}
                                 onClick={this.handleClickSubmit}
                             >
-                                Submit
+                                Simpan
                             </button>
                         </div>
                     </div>
@@ -439,7 +440,7 @@ class Cart extends Component {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Search Product..."
+                            placeholder="Cari Produk.."
                             onChange={this.handleChangeSearch}
                             onKeyDown={this.handleSeach}
                         />
