@@ -1,5 +1,7 @@
 @extends('layouts.auth')
 
+@section('title', 'Login')
+
 @section('content')
 
 <p class="login-box-msg">You forgot your password? Here you can easily retrieve a new password.</p>
