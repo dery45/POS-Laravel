@@ -47,7 +47,7 @@
                     <td>{{ $order->userName() }}</td>
                     <td>{{ config('settings.currency_symbol') }} {{ $order->formattedTotal() }}</td>
                     <td>{{ config('settings.currency_symbol') }} {{ $order->formattedReceivedAmount() }}</td>
-                    <td>{{ config('settings.currency_symbol') }} {{ number_format($order->total() - $order->receivedAmount(), 2) }}</td>
+                    <td>{{ config('settings.currency_symbol') }} {{ number_format($order->receivedAmount() - $order->total(), 2) }}</td>
                     <td>{{ $order->paymentMethod() }}</td>
                     <td>{{ $order->created_at }}</td>
                     <td>
