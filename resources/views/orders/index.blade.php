@@ -54,7 +54,7 @@
                         <button class="btn btn-primary btn-order-details" data-order-id="{{ $order->id }}" data-toggle="modal" data-target="#orderDetailsModal">
                             <i class="fas fa-eye"></i> Detail
                         </button>
-                        <a href="#" class="btn btn-secondary">
+                        <a href="{{ route('orders.print', ['order' => $order->id]) }}" class="btn btn-secondary" target="_blank">
                             <i class="fas fa-print"></i> Print
                         </a>
                     </td>
