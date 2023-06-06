@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Login')
+
 @section('content')
 <form method="POST" action="{{ route('password.update') }}">
     <input type="hidden" name="token" value="{{ $token }}">

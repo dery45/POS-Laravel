@@ -302,7 +302,7 @@ class Cart extends Component {
                   amount: itemAmount,
                 };
               }),
-              amount: totalAmount,
+              amount: amount,
             };
             
             return axios

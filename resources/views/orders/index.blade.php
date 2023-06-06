@@ -3,7 +3,7 @@
 @section('title', 'Orders List')
 @section('content-header', 'Order List')
 @section('content-actions')
-    <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a>
+    <!-- <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a> -->
 @endsection
 
 @section('content')
@@ -47,14 +47,14 @@
                     <td>{{ $order->userName() }}</td>
                     <td>{{ config('settings.currency_symbol') }} {{ $order->formattedTotal() }}</td>
                     <td>{{ config('settings.currency_symbol') }} {{ $order->formattedReceivedAmount() }}</td>
-                    <td>{{ config('settings.currency_symbol') }} {{ number_format($order->total() - $order->receivedAmount(), 2) }}</td>
+                    <td>{{ config('settings.currency_symbol') }} {{ number_format($order->receivedAmount() - $order->total(), 2) }}</td>
                     <td>{{ $order->paymentMethod() }}</td>
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <button class="btn btn-primary btn-order-details" data-order-id="{{ $order->id }}" data-toggle="modal" data-target="#orderDetailsModal">
                             <i class="fas fa-eye"></i> Detail
                         </button>
-                        <a href="#" class="btn btn-secondary">
+                        <a href="{{ route('orders.print', ['order' => $order->id]) }}" class="btn btn-secondary" target="_blank">
                             <i class="fas fa-print"></i> Print
                         </a>
                     </td>

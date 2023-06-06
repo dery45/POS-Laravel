@@ -9,6 +9,14 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\CapabilityProfile;
+
+use Illuminate\Support\Facades\Response;
+use PDF; // Assuming you have a PDF library installed
+
+
 class OrderController extends Controller
 {
     public function index(Request $request) {
@@ -30,37 +38,6 @@ class OrderController extends Controller
 
         return view('orders.index', compact('orders', 'total', 'receivedAmount'));
     }
-
-    /*public function store(OrderStoreRequest $request)
-    {
-        $order = Order::create([
-            'customer_id' => $request->customer_id,
-            'user_id' => $request->user()->id,
-        ]);
-
-        $cart = $request->user()->cart()->get();
-        foreach ($cart as $item) {
-            if ($item->pivot->quantity >= $item->minimum_low) {
-                $price = $item->pivot->quantity * $item->low_price;
-            } else {
-                $price = $item->pivot->quantity * $item->price;
-            }
-            $order->items()->create([
-                'price' => $price,
-                'quantity' => $item->pivot->quantity,
-                'payment_method' => $request->payment_method,
-                'product_id' => $item->id,
-            ]);
-            $item->quantity = $item->quantity - $item->pivot->quantity;
-            $item->save();
-        }
-        $request->user()->cart()->detach();
-        $order->payments()->create([
-            'amount' => $request->amount,
-            'user_id' => $request->user()->id,
-        ]);
-        return 'success';
-    }*/
 
     public function show($id)
     {
@@ -136,31 +113,69 @@ class OrderController extends Controller
         return redirect()->back()->with('error', 'No proof image found.');
     }
 
-    
+    private function printReceipt($order)
+    {
+        $connector = new WindowsPrintConnector("POS-58-Share");
+        $printer = new Printer($connector);
 
+        // Set the character encoding and line spacing
+        $printer->setLineSpacing(30);
+        $user = $order->userName();
+        $id = $order->id;
+        $date = date('Y-m-d H:i:s');
 
-    }
+        // Print header
+        $printer->text("--------------------------------\n");
+        $printer->text("         SUGE PLASTIK        \n");
+        $printer->text("--------------------------------\n");
+        $printer->text("Tgl     :   " . str_pad($date, 16, ' ', STR_PAD_LEFT). "\n");
+        $printer->text("Kasir   :      " . str_pad($user, 16, ' ', STR_PAD_LEFT). "\n");
+        $printer->text("Id      :      " . str_pad($id, 16, ' ', STR_PAD_LEFT). "\n");
+        $printer->text("--------------------------------\n");
 
+        // Print order items
+        foreach ($order->items as $item) {
+            $productName = $item->product->name;
+            $quantity = $item->quantity;
+            $method = $item->payment_method;
+            $price = $item->amount;
+            $subtotal = $item->quantity * $item->amount;
+            
 
-
-/*
-    $cart = $request->user()->cart()->get();
-    foreach ($cart as $item) {
-        if ($item->pivot->quantity >= $item->minimum_low) {
-            $price = $item->pivot->quantity * $item->low_price;
-        } else {
-            $price = $item->pivot->quantity * $item->price;
+            $printer->text($productName);
+            $printer->text(str_pad($quantity, 5, ' ', STR_PAD_LEFT));
+            $printer->text(str_pad(number_format($price), 15, ' ', STR_PAD_LEFT). "\n");
+            $printer->text(str_pad(number_format($subtotal), 31, ' ', STR_PAD_LEFT));
+            $printer->text("\n");
         }
 
-        $order->items()->create([
-            'amount' => $price,
-            'quantity' => $item->pivot->quantity,
-            'product_id' => $item->id,
-        ]);
+        // Print total amount and payment information
+        $printer->text("--------------------------------\n");
+        $printer->text("Total:         " . str_pad(number_format($order->total()), 16, ' ', STR_PAD_LEFT) . "\n");
+        $printer->text("Metode:        " . str_pad($method, 16, ' ', STR_PAD_LEFT). "\n");
+        $printer->text("Uang Diterima: " . str_pad(number_format($order->receivedAmount()), 16, ' ', STR_PAD_LEFT) . "\n");
+        $printer->text("Kembalian:     " . str_pad(number_format($order->receivedAmount() - $order->total()), 16, ' ', STR_PAD_LEFT) . "\n");
 
-        
+        // Print footer
+        $printer->text("--------------------------------\n");
+        $printer->text("       Terima Kasih..    \n");
+        $printer->text("--------------------------------\n");
 
-        $item->quantity = $item->quantity - $item->pivot->quantity;
-        $item->save();
+
+        // Cut the receipt
+        $printer->cut();
+
+        // Close the printer
+        $printer->close();
     }
-*/
+
+    
+    public function print(Order $order)
+    {
+        $receipt = $this->printReceipt($order);
+    }
+
+}
+
+
+

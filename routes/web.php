@@ -28,6 +28,8 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::get('/orders/{id}/details', [OrderController::class, 'details'])->name('orders.details');
     Route::get('/orders/list', [OrderController::class, 'getOrderList'])->name('orders.list');
     Route::post('/orders/{id}/upload-proof', [OrderController::class, 'uploadProof'])->name('orders.uploadProof');
+    Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+
 });
 
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {

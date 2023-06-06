@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
         "maatwebsite/excel": "^1.1",
+        "mike42/escpos-php": "^4.0",
         "spatie/laravel-permission": "^5.10"
     },
     "require-dev": {
