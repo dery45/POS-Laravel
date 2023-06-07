@@ -254,10 +254,10 @@ class ProductController extends Controller
                 $price = $data[2] ?? null;
                 $quantity = $data[3] ?? null;
                 $description = $data[4] ?? null;
-                $minimumLow = $data[6] ?? null;
-                $brand = $data[7] ?? null;
-                $lowPrice = $data[8] ?? null;
-                $stockPrice = $data[9] ?? null;
+                $minimumLow = $data[5] ?? null;
+                $brand = $data[6] ?? null;
+                $lowPrice = $data[7] ?? null;
+                $stockPrice = $data[8] ?? null;
     
                 // Create a new product using the parsed data
                 $product = new Product();
@@ -266,7 +266,6 @@ class ProductController extends Controller
                 $product->price = $price;
                 $product->quantity = $quantity;
                 $product->description = $description;
-    
                 $product->minimum_low = $minimumLow;
                 $product->brand = $brand;
                 $product->low_price = $lowPrice;
