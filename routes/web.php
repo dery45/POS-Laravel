@@ -36,6 +36,7 @@ Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () 
     Route::resource('categories', CategoryController::class);
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory.index');
     Route::resource('products', ProductController::class);
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
     Route::get('/search', 'SearchController@search')->name('search');
 });

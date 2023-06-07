@@ -60,13 +60,14 @@
             })
 
             swalWithBootstrapButtons.fire({
-                title: 'Hapus?',
-                text: "Apakah anda yakin ingin menhpaus data?",
+                title: 'Apakah Anda yakin?',
+                text: "Kategori akan dihapus permanen!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus data!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.value) {
                     $.post($this.data('url'), { _method: 'DELETE', _token: '{{ csrf_token() }}' }, function (res) {

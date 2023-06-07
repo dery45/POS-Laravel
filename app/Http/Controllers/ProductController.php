@@ -212,17 +212,17 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+   public function destroy(Product $product)
     {
         if ($product->image) {
             Storage::delete($product->image);
         }
         $product->delete();
 
-        return response()->json([
-            'success' => true
-        ]);
+        return redirect()->route('products.index')->with('success', 'Success, your product has been deleted.');
     }
+
+    
 
     public function import(Request $request)
     {
