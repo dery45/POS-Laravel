@@ -88,61 +88,23 @@
                         <a href="{{ route('products.edit', $product) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <button class="btn btn-danger btn-delete" data-url="{{route('products.destroy', $product)}}" data-token="{{csrf_token()}}">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-danger btn-delete"
+                            data-url="{{ route('products.destroy', $product) }}"><i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        {{ $products->render() }}
+         <!-- Add pagination links -->
+         {{ $products->links() }}
     </div>
 </div>
 @endsection
-
 @section('js')
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function () {
-         // Function to fetch search results and update the autocomplete dropdown
-         function fetchSearchResults(query, callback) {
-            $.ajax({
-                url: '{{ route("autocomplete.search") }}',
-                dataType: 'json',
-                data: {
-                    term: query
-                },
-                success: function(data) {
-                    callback(data);
-                }
-            });
-        }
-
-        // Initialize autocomplete
-        $('#searchInput').autocomplete({
-            source: function(request, response) {
-                fetchSearchResults(request.term, function(data) {
-                    response(data);
-                });
-            },
-            minLength: 2, // Minimum characters before autocomplete starts
-            select: function(event, ui) {
-                // Redirect to the selected product page
-                window.location.href = '{{ route("products.show", ["product" => ":id"]) }}'.replace(':id', ui.item.id);
-            }
-        });
-
-        // Update search results on keyup
-        $('#searchInput').on('keyup', function() {
-            var query = $(this).val();
-            fetchSearchResults(query, function(data) {
-                // Update autocomplete dropdown
-                $('#searchInput').autocomplete('option', 'source', data);
-            });
-        });
-
+ $(document).ready(function () {
         $(document).on('click', '.btn-delete', function () {
             $this = $(this);
             const swalWithBootstrapButtons = Swal.mixin({
@@ -151,39 +113,27 @@
                     cancelButton: 'btn btn-danger'
                 },
                 buttonsStyling: false
-            });
+            })
 
             swalWithBootstrapButtons.fire({
-                title: 'Hapus?',
-                text: "Apakah anda yakin ingin menhpaus data?",
+                title: 'Apakah Anda yakin?',
+                text: "Produk akan dihapus permanen!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus data!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.value) {
-                    var url = $this.data('url');
-                    var token = $this.data('token');
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: {
-                            _method: 'DELETE',
-                            _token: token
-                        },
-                        success: function (res) {
-                            $this.closest('tr').fadeOut(500, function () {
-                                $(this).remove();
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.log(xhr.responseText);
-                        }
-                    });
+                    $.post($this.data('url'), { _method: 'DELETE', _token: '{{ csrf_token() }}' }, function (res) {
+                        $this.closest('tr').fadeOut(500, function () {
+                            $(this).remove();
+                        })
+                    })
                 }
-            });
-        });
-    });
+            })
+        })
+    })
 </script>
 @endsection

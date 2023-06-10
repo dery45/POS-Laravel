@@ -56,6 +56,8 @@
                 @endforeach
                 </tbody>
             </table>
+            <!-- Add pagination links -->
+            {{ $users->links() }}
         </div>
     </div>
 @endsection

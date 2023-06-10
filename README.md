@@ -23,6 +23,12 @@ Laravel utilizes [Composer](https://getcomposer.org/) to manage its dependencies
     cd YourDirectoryName
     composer install
 
+### Install printer driver
+
+    composer require mike42/escpos-php
+    setup XAMPP extension:intl
+
+
 ### Config file
 
 Rename or copy `.env.example` file to `.env` 1.`php artisan key:generate` to generate app key.
@@ -43,12 +49,18 @@ Rename or copy `.env.example` file to `.env` 1.`php artisan key:generate` to gen
 ### Create storage link
 
 `php artisan storage:link`
+`php artisan route:clear`
+`php artisan route:cache`
 
 ### Run Server
 
 1. `php artisan serve` or Laravel Homestead
 1. Visit `localhost:8000` in your browser. Email: `admin@gmail.com`, Password: `admin123`.
 
+### Using App Runner
+
+1. Rename dir1 & dir2 in app_runner.py
+2. run shortcut
 
 ### Screenshots
 

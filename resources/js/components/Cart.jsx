@@ -310,6 +310,7 @@ class Cart extends Component {
               .then((res) => {
                 console.log("Response Data:", res.data);
                 this.loadCart();
+                this.loadProducts();
                 return res.data;
               })
               .catch((err) => {
@@ -473,7 +474,7 @@ class Cart extends Component {
                     <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                        <h5 className="modal-title">Jumlah Product</h5>
+                        <h5 className="modal-title">Jumlah Produk</h5>
                         <button type="button" className="close" onClick={this.handleCloseProduct}>
                             <span>&times;</span>
                         </button>
@@ -500,11 +501,11 @@ class Cart extends Component {
                                         className="btn btn-primary"
                                         onClick={this.handleCloseProduct}
                                     >
-                                        Close
+                                        Tutup
                                     </button>
                                 
                                     <button type="submit" className="btn btn-primary">
-                                        Submit
+                                        Simpan
                                     </button>
                                 </div>
                             </form>
