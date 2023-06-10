@@ -5,14 +5,8 @@ def run_flask_app(app_file, port):
     return Popen(cmd)
 
 if __name__ == '__main__':
-    users_app_process = run_flask_app('users:app', 5550)
-    products_cat_app_process = run_flask_app('products_cat:app', 5551)
-    products_app_process = run_flask_app('products:app', 5552)
-    stock_history_app_process = run_flask_app('stock_history:app', 5553)
-    price_history_app_process = run_flask_app('price_history:app', 5554)
+    rekap_harian = run_flask_app('rekap_harian:app', 5550)
 
-    # Add any additional logic or tasks here
 
-    # Wait for both processes to complete
-    users_app_process.wait()
-    products_cat_app_process.wait()
+    # Wait for processes to complete
+    rekap_harian.wait()

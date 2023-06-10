@@ -19,6 +19,12 @@ subprocess.Popen(['cmd', '/k', command2], shell=True)
 command3 = 'php artisan serve'
 subprocess.Popen(['cmd', '/k', command3], shell=True)
 
+# Command 4
+directory4 = r'E:\Project\POS-Plastik\POS-Laravel\Backend\venv\Scripts'
+command1 = 'activate.bat && waitress-serve --port=5550 rekap_harian:app'
+os.chdir(directory4)
+subprocess.Popen(['cmd', '/k', command1], shell=True)
+
 # Wait for server to start
 time.sleep(5)
 
