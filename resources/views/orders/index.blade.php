@@ -74,6 +74,8 @@
             </tfoot>
         </table>
         {{ $orders->render() }}
+         <!-- Add pagination links -->
+        {{ $orders->links() }}
     </div>
 </div>
 
