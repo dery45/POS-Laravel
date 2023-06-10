@@ -167,7 +167,8 @@ class OrderController extends Controller
         
         // Print footer
         $printer->text("--------------------------------\n");
-        $printer->text("       Terima Kasih..    \n");
+        $printer->text("          Terima Kasih..        \n");
+        $printer->text("     Info: 08882976524/Suge     \n");
         $printer->text("--------------------------------\n");
 
 
