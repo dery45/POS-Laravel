@@ -4,13 +4,13 @@ import webbrowser
 import time
 
 # Command 1
-directory1 = r'D:\Work Area\Project\XAMPP'
+directory1 = r'E:\Project\XAMPP 2'
 command1 = 'xampp_start.exe'
 os.chdir(directory1)
 subprocess.call(command1, shell=True)
 
 # Command 2
-directory2 = r'D:\Work Area\Project\POS - Github\laravel-pos-master'
+directory2 = r'E:\Project\POS-Plastik\POS-Laravel'
 command2 = 'npm run dev'
 os.chdir(directory2)
 subprocess.Popen(['cmd', '/k', command2], shell=True)

@@ -115,6 +115,8 @@ class OrderController extends Controller
 
     private function printReceipt($order)
     {
+
+
         $connector = new WindowsPrintConnector("POS-58-Share");
         $printer = new Printer($connector);
 
@@ -141,11 +143,16 @@ class OrderController extends Controller
             $price = $item->amount / $quantity;
             $subtotal = $item->amount;   
 
-            $printer->text($productName);
-            $printer->text(str_pad($quantity, 5, ' ', STR_PAD_LEFT));
-            $printer->text(str_pad(number_format($price), 15, ' ', STR_PAD_LEFT). "\n");
-            $printer->text(str_pad(number_format($subtotal), 31, ' ', STR_PAD_LEFT));
+            $printer->text($productName. "\n");
+            // $printer->text(str_pad($quantity, 5, ' ', STR_PAD_LEFT));
+            $printer->text(number_format($price)." "."x"." ".$quantity. str_pad(number_format($subtotal), 16, ' ', STR_PAD_LEFT). "\n");
+            // $printer->text(str_pad(number_format($subtotal), 31, ' ', STR_PAD_LEFT));
             $printer->text("\n");
+
+            // echo ("--------------------------------<br>");
+            // echo ($productName. "<br>");
+            // echo number_format($price)." "."x"." ".$quantity. str_pad(number_format($subtotal), 16, ' ', STR_PAD_LEFT). "\n";
+
         }
 
         // Print total amount and payment information
