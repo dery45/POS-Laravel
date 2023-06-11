@@ -55,12 +55,25 @@ Rename or copy `.env.example` file to `.env` 1.`php artisan key:generate` to gen
 ### Run Server
 
 1. `php artisan serve` or Laravel Homestead
-1. Visit `localhost:8000` in your browser. Email: `admin@gmail.com`, Password: `admin123`.
+2. Visit `localhost:8000` in your browser. Email: `admin@gmail.com`, Password: `admin123`.
+
+### Setup backend API
+
+1. install python latest
+2. `py -m pip install --user virtualenv` installing venv
+3. move to directory POS-Laravel/Backend
+4. `py -m venv venv` Creating a virtual environment
+5. `venv\Scripts\activate` activate the virtual environtment
+6. `pip install -r requirements.txt` install all packages
+7. setup app_runner.py
+
 
 ### Using App Runner
 
-1. Rename dir1 & dir2 in app_runner.py
-2. run shortcut
+1. dir1 = XAMPP Folder PATH
+2. dir2 = POS-Laravel PATH
+3. dir4 = POS-Laravel/Backend/venv/Scripts PATH
+4. run the program / create shortcut
 
 ### Screenshots
 
