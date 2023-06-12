@@ -10,23 +10,23 @@
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-7"></div>
-            <div class="col-md-5">
-                <form action="{{ route('orders.index') }}">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" />
+            <div class="col-md-0"></div>
+                <div class="col-md-5">Filter Tanggal:
+                    <form action="{{ route('orders.index') }}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" />
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" />
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-primary" type="submit">Submit</button>
+                            </div>
                         </div>
-                        <div class="col-md-5">
-                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" />
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-primary" type="submit">Submit</button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
         <table class="table">
             <thead>
                 <tr>
