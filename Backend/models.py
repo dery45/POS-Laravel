@@ -90,7 +90,38 @@ class User(db.Model):
         self.address = address
         self.phone_number = phone_number
 
-# Define other models (Order, OrderItem, Payment, User) in a similar way
+class Product(db.Model):
+    __tablename__ = 'products'
+
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(191))
+    description = db.Column(db.Text)
+    category_product = db.Column(db.BigInteger)
+    image = db.Column(db.String(191))
+    barcode = db.Column(db.String(191))
+    status = db.Column(db.Boolean)
+    minimum_low = db.Column(db.Integer)
+    brand = db.Column(db.String(191))
+    low_price = db.Column(db.DECIMAL(10, 2))
+    stock_price = db.Column(db.DECIMAL(10, 2))
+    price = db.Column(db.DECIMAL(10, 2))
+    quantity = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=db.func.current_timestamp())
+
+    def __init__(self, name, description, category_product, image, barcode, status, minimum_low, brand, low_price, stock_price, price, quantity):
+        self.name = name
+        self.description = description
+        self.category_product = category_product
+        self.image = image
+        self.barcode = barcode
+        self.status = status
+        self.minimum_low = minimum_low
+        self.brand = brand
+        self.low_price = low_price
+        self.stock_price = stock_price
+        self.price = price
+        self.quantity = quantity
 
 
 def init_db(app):
