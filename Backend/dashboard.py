@@ -159,6 +159,7 @@ class OrderQuantityByDay(Resource):
 
         return data
 
+# Chart 3 : List  Produk terlaku
 class ProductQuantity(Resource):
     def get(self):
         start_date = request.args.get('start_date')
@@ -186,6 +187,34 @@ class ProductQuantity(Resource):
 
         return data
 
+# Chart 4 : Pie payment stats
+class PaymentStats(Resource):
+    def get(self):
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        query = db.session.query(OrderItem.payment_method, func.sum(OrderItem.amount))
+
+        if start_date and end_date:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            query = query.filter(func.date(OrderItem.created_at).between(start_datetime, end_datetime))
+
+        payment_stats = query.group_by(OrderItem.payment_method).all()
+
+        total_amount = sum(amount for _, amount in payment_stats)
+
+        data = {}
+        for payment_method, amount in payment_stats:
+            percent = (amount / total_amount) * 100 if total_amount != 0 else 0
+            data[payment_method] = {
+                'total': str(amount),
+                'percent': str(percent)
+            }
+
+        return data
+
+api.add_resource(PaymentStats, '/payment-stats')
 api.add_resource(ProductQuantity, '/product-quantity')
 api.add_resource(OrderQuantityByDay, '/order-quantity')
 api.add_resource(IncomeProfitByDay, '/income-profit')
