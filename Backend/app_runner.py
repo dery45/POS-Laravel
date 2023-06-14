@@ -4,7 +4,7 @@ import webbrowser
 import time
 
 # Command 1
-directory1 = r'D:\Work Area\Project\XAMPP'
+directory1 = r"D:\Work Area\Project\XAMPP"
 command1 = 'xampp_start.exe'
 os.chdir(directory1)
 subprocess.call(command1, shell=True)
@@ -18,6 +18,12 @@ subprocess.Popen(['cmd', '/k', command2], shell=True)
 # Command 3
 command3 = 'php artisan serve'
 subprocess.Popen(['cmd', '/k', command3], shell=True)
+
+# Command 4
+directory4 = r"D:\Work Area\Project\POS - Github\laravel-pos-master\Backend\venv\Scripts"
+command4 = 'activate.bat && cd ../.. && waitress-serve --port=5550 rekap_harian:app'
+os.chdir(directory4)
+subprocess.Popen(['cmd', '/k', command4], shell=True)
 
 # Wait for server to start
 time.sleep(5)
