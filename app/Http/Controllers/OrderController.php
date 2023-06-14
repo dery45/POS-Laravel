@@ -115,6 +115,8 @@ class OrderController extends Controller
 
     private function printReceipt($order)
     {
+
+
         $connector = new WindowsPrintConnector("POS-58-Share");
         $printer = new Printer($connector);
 
@@ -138,15 +140,19 @@ class OrderController extends Controller
             $productName = $item->product->name;
             $quantity = $item->quantity;
             $method = $item->payment_method;
-            $price = $item->amount;
-            $subtotal = $item->quantity * $item->amount;
-            
+            $price = $item->amount / $quantity;
+            $subtotal = $item->amount;   
 
-            $printer->text($productName);
-            $printer->text(str_pad($quantity, 5, ' ', STR_PAD_LEFT));
-            $printer->text(str_pad(number_format($price), 15, ' ', STR_PAD_LEFT). "\n");
-            $printer->text(str_pad(number_format($subtotal), 31, ' ', STR_PAD_LEFT));
+            $printer->text($productName. "\n");
+            // $printer->text(str_pad($quantity, 5, ' ', STR_PAD_LEFT));
+            $printer->text(number_format($price)." "."x"." ".$quantity. str_pad(number_format($subtotal), 16, ' ', STR_PAD_LEFT). "\n");
+            // $printer->text(str_pad(number_format($subtotal), 31, ' ', STR_PAD_LEFT));
             $printer->text("\n");
+
+            // echo ("--------------------------------<br>");
+            // echo ($productName. "<br>");
+            // echo number_format($price)." "."x"." ".$quantity. str_pad(number_format($subtotal), 16, ' ', STR_PAD_LEFT). "\n";
+
         }
 
         // Print total amount and payment information
@@ -156,9 +162,11 @@ class OrderController extends Controller
         $printer->text("Uang Diterima: " . str_pad(number_format($order->receivedAmount()), 16, ' ', STR_PAD_LEFT) . "\n");
         $printer->text("Kembalian:     " . str_pad(number_format($order->receivedAmount() - $order->total()), 16, ' ', STR_PAD_LEFT) . "\n");
 
+
         // Print footer
         $printer->text("--------------------------------\n");
-        $printer->text("       Terima Kasih..    \n");
+        $printer->text("          Terima Kasih..        \n");
+        $printer->text("     Info: 08882976524/Suge     \n");
         $printer->text("--------------------------------\n");
 
 
@@ -174,6 +182,14 @@ class OrderController extends Controller
     {
         $receipt = $this->printReceipt($order);
     }
+
+    public function destroy(Order $order)
+    {
+        $order->delete();
+    
+        return response()->json(['message' => 'Order deleted successfully']);
+    }
+      
 
 }
 
