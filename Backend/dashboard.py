@@ -119,7 +119,48 @@ class IncomeProfitByDay(Resource):
 
 # Chart 2 : Perbandingan pengunjung dengan barang terjual
 
+class OrderQuantityByDay(Resource):
+    def get(self):
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
 
+        if not start_date and not end_date:
+            # Calculate the current month's start and end dates
+            today = date.today()
+            start_date = date(today.year, today.month, 1).strftime('%Y-%m-%d')
+            next_month = (date(today.year, today.month, 1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+            end_date = next_month.strftime('%Y-%m-%d')
+
+        start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+        end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+
+        data = {}
+        current_date = start_datetime
+        while current_date <= end_datetime:
+            next_date = current_date + timedelta(days=1)
+
+            order_count = Order.query.filter(
+                func.date(Order.created_at).between(current_date, next_date - timedelta(seconds=1))
+            ).count()
+
+            qty_count = db.session.query(func.sum(OrderItem.quantity)).join(
+                Order, Order.id == OrderItem.order_id
+            ).filter(
+                func.date(Order.created_at).between(current_date, next_date - timedelta(seconds=1))
+            ).scalar()
+            if qty_count == None:
+                qty_count = 0
+
+            data[current_date.strftime('%Y-%m-%d')] = {
+                'order_count': str(order_count),
+                'qty_count': str(qty_count)
+            }
+
+            current_date = next_date
+
+        return data
+
+api.add_resource(OrderQuantityByDay, '/order-quantity')
 api.add_resource(IncomeProfitByDay, '/income-profit')
 api.add_resource(BoxValueResource, '/dashboardbox')
 
