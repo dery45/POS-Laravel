@@ -118,7 +118,6 @@ class IncomeProfitByDay(Resource):
         return data
 
 # Chart 2 : Perbandingan pengunjung dengan barang terjual
-
 class OrderQuantityByDay(Resource):
     def get(self):
         start_date = request.args.get('start_date')
@@ -160,6 +159,34 @@ class OrderQuantityByDay(Resource):
 
         return data
 
+class ProductQuantity(Resource):
+    def get(self):
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        limit = int(request.args.get('limit', 5))  # Default limit is set to 5 if not provided
+
+        query = db.session.query(Product.name, func.sum(OrderItem.quantity)).join(
+            OrderItem, OrderItem.product_id == Product.id
+        ).group_by(Product.name).order_by(func.sum(OrderItem.quantity).desc())
+
+        if start_date and end_date:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            query = query.filter(func.date(OrderItem.created_at).between(start_datetime, end_datetime))
+
+        query = query.limit(limit)  # Apply the limit here
+
+        product_counts = query.all()
+
+        data = {}
+        for product_name, qty_count in product_counts:
+            data[product_name] = {
+                'qty_count': str(qty_count)
+            }
+
+        return data
+
+api.add_resource(ProductQuantity, '/product-quantity')
 api.add_resource(OrderQuantityByDay, '/order-quantity')
 api.add_resource(IncomeProfitByDay, '/income-profit')
 api.add_resource(BoxValueResource, '/dashboardbox')
