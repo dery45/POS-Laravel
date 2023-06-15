@@ -25,6 +25,12 @@ command4 = 'activate.bat && cd ../.. && waitress-serve --port=5550 rekap_harian:
 os.chdir(directory4)
 subprocess.Popen(['cmd', '/k', command4], shell=True)
 
+# Command 5
+directory5 = r"D:\Work Area\Project\POS - Github\laravel-pos-master\Backend\venv\Scripts"
+command5 = 'activate.bat && cd ../.. && waitress-serve --port=5551 dashboard:app'
+os.chdir(directory5)
+subprocess.Popen(['cmd', '/k', command5], shell=True)
+
 # Wait for server to start
 time.sleep(5)
 
