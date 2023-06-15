@@ -24,14 +24,14 @@ class CartController extends Controller
                 ->whereIn('order_id', function ($query) {
                     $query->select('id')
                         ->from('order_items')
-                        ->where('payment_method', 'cash');
+                        ->where('payment_method', 'Cash');
                 })
                 ->sum('amount');
         $cashlessin=Payment::whereDate('created_at', $today)
                 ->whereIn('order_id', function ($query) {
                     $query->select('id')
                         ->from('order_items')
-                        ->where('payment_method', 'cashless');
+                        ->where('payment_method', 'Cashless');
                 })
                 ->sum('amount');
 
@@ -51,19 +51,6 @@ class CartController extends Controller
                 return $i->receivedAmount();
             })->sum()+$capitalValue,
         ]);
-        if ($request->wantsJson()) {
-            return response()->json([
-                'capitalValue' => $capitalValue,
-                'cashIn' => $cashin,
-                'cashlessIn' => $cashlessin,
-                'pendapatan' => $orders->where('created_at', '>=', date('Y-m-d') . ' 00:00:00')->map(function ($i) {
-                    if ($i->receivedAmount() > $i->total()) {
-                        return $i->total();
-                    }
-                    return $i->receivedAmount();
-                })->sum() + $capitalValue,
-            ]);
-        }
     }
 
     public function store(Request $request)
