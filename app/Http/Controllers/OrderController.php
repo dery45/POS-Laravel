@@ -183,6 +183,14 @@ class OrderController extends Controller
         $receipt = $this->printReceipt($order);
     }
 
+    public function destroy(Order $order)
+    {
+        $order->delete();
+    
+        return response()->json(['message' => 'Order deleted successfully']);
+    }
+      
+
 }
 
 

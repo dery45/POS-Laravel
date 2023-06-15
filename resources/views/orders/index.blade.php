@@ -57,6 +57,9 @@
                         <a href="{{ route('orders.print', ['order' => $order->id]) }}" class="btn btn-secondary" target="_blank">
                             <i class="fas fa-print"></i> Print
                         </a>
+                        <button class="btn btn-danger btn-delete" data-url="{{ route('orders.destroy', $order) }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -182,6 +185,46 @@
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function() {
+        $(document).on('click', '.btn-delete', function () {
+    var $this = $(this);
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Produk akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: $this.data('url'),
+                type: 'POST',
+                data: {
+                    _method: 'DELETE',
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function (res) {
+                    $this.closest('tr').fadeOut(500, function () {
+                        $(this).remove();
+                    });
+                }
+            });
+        }
+    });
+});
+
+
         $('.btn-order-details').on('click', function() {
             var orderId = $(this).data('order-id');
 

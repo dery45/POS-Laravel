@@ -23,10 +23,9 @@ class Cart extends Component {
             showModal: false,
             selectedProduct: null,
             minimumLowValue: 0,
-            selectedProductIndex: 0,
         };
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
-        this.handleKeyDown=this.handleKeyDown.bind(this);
+
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.loadCart = this.loadCart.bind(this);
@@ -47,19 +46,25 @@ class Cart extends Component {
         this.loadCart();
         this.loadProducts();
         this.loadCustomers();
-        this.loadCashIn();
-        document.addEventListener("keydown", this.handleKeyDown);
-    }
-    componentWillUnmount(){
-        document.removeEventListener("keydown", this.handleKeyDown);
+        this.loadCashData();
     }
 
-    loadCashIn() {
+    loadCashData() {
         axios.get("/cart").then((res) => {
-          const { cashIn } = res.data;
-          this.setState({ cashIn });
+            const cart = res.data;
+            this.setState({ cart });
         });
-      }
+
+        axios.get("/cart").then((res) => {
+            const { capitalValue, cashIn, cashlessIn, pendapatan } = res.data;
+            this.setState({
+                capitalValue,
+                cashIn,
+                cashlessIn,
+                pendapatan,
+            });
+        });
+    }
 
     loadCustomers() {
         axios.get(`/customers`).then((res) => {
@@ -82,7 +87,7 @@ class Cart extends Component {
             const produk = res.data.data.map((product) => {
                 return {
                     ...product,
-                    low_price: product.low_price, 
+                    low_price: product.low_price, // tambahkan properti low_price
                 };
             });
             this.setState({ produk });
@@ -95,42 +100,13 @@ class Cart extends Component {
             const min = res.data.data.map((product) => {
                 return {
                     ...product,
-                    minimum_low: product.minimum_low, 
+                    minimum_low: product.minimum_low, // tambahkan properti low_price
                     minimumLowValue: minimum_low,
                 };
             });
             this.setState({ min });
         });
     }
-
-    handleKeyDown(event) {
-        const { products, selectedProductIndex } = this.state;
-        // Handle arrow key presses
-        switch (event.key) {
-          case "ArrowRight":
-            event.preventDefault();
-            this.setState((prevState) => ({
-              selectedProductIndex:
-                (prevState.selectedProductIndex - 1 + products.length) %
-                products.length,
-            }));
-            break;
-          case "ArrowLeft":
-            event.preventDefault();
-            this.setState((prevState) => ({
-              selectedProductIndex:
-                (prevState.selectedProductIndex + 1) % products.length,
-            }));
-            break;
-          case "Enter":
-            event.preventDefault();
-            const selectedProduct = products[selectedProductIndex];
-            this.handleOpenProduct(selectedProduct.barcode);
-            break;
-          default:
-            break;
-        }
-      }
 
     handleSubmit = (id) => (event) => {
         event.preventDefault();
@@ -350,8 +326,8 @@ class Cart extends Component {
       }
     
     render() {
-        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashlessIn, pendapatan } = this.state;
-        const { cashIn } = this.state;
+        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashIn, cashlessIn, pendapatan } = this.state;
+        const totalAmount = this.getTotal(cart);
         return (
             
             <div className="row">
@@ -382,12 +358,6 @@ class Cart extends Component {
                         </div>
                     </div>
                     {/* ...existing code... */}
-                    <div className="row">
-          <div className="col">Cash In:</div>
-          <div className="col text-right">
-            {window.APP.currency_symbol} {cashIn}
-          </div>
-        </div>
                     <div className="user-cart">
                         <div className="card">
                             <table className="table table-striped">
