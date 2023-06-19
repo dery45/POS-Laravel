@@ -3,8 +3,10 @@
 @section('title', 'List Produk')
 @section('content-header', 'List Produk')
 @section('content-actions')
+@hasanyrole('superadmin|inventory')
 <button class="btn btn-success" data-toggle="modal" data-target="#importModal">Import CSV</button>
 <a href="{{route('products.create')}}" class="btn btn-primary">Tambah Data</a>
+@endhasanyrole
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
@@ -65,7 +67,9 @@
                     <th>Status</th>
                     <th>Tgl Dibuat</th>
                     <th>Tgl Diubah</th>
+                    @hasanyrole('superadmin|inventory')
                     <th>Aksi</th>
+                    @endhasanyrole
                 </tr>
             </thead>
             <tbody>
@@ -84,6 +88,7 @@
                     </td>
                     <td>{{$product->created_at}}</td>
                     <td>{{$product->updated_at}}</td>
+                    @hasanyrole('superadmin|inventory')
                     <td>
                         <a href="{{ route('products.edit', $product) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
@@ -92,6 +97,7 @@
                             data-url="{{ route('products.destroy', $product) }}"><i class="fas fa-trash"></i>
                         </button>
                     </td>
+                    @endhasanyrole
                 </tr>
                 @endforeach
             </tbody>

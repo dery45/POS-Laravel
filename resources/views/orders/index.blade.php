@@ -57,9 +57,11 @@
                         <a href="{{ route('orders.print', ['order' => $order->id]) }}" class="btn btn-secondary" target="_blank">
                             <i class="fas fa-print"></i> Print
                         </a>
+                        @hasrole('superadmin')
                         <button class="btn btn-danger btn-delete" data-url="{{ route('orders.destroy', $order) }}">
                             <i class="fas fa-trash"></i>
                         </button>
+                        @endhasrole
                     </td>
                 </tr>
                 @endforeach
