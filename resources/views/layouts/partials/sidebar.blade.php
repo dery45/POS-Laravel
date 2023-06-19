@@ -61,7 +61,7 @@
                 @endhasanyrole
 
                 <!-- Cashier -->
-                @hasanyrole('superadmin|admin|cashier')
+                @hasanyrole('superadmin|cashier')
                 <li class="nav-item sidebar-item {{ 'cart' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('cart.index') }}" class="nav-link {{ activeSegment('cart') }}">
                         <i class="nav-icon fas fa-calculator"></i>
@@ -101,12 +101,14 @@
                 @endhasanyrole
 
                 <!-- Settings -->
+                @hasrole('superadmin')
                 <li class="nav-item sidebar-item {{ 'settings' == request()->path() ? 'active' : '' }}">
                     <a href="{{ route('settings.index') }}" class="nav-link {{ activeSegment('settings') }}">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>Pengaturan</p>
                     </a>
                 </li>
+                @endhasrole
 
                 <!-- Logout -->
                 <li class="nav-item">

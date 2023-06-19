@@ -3,7 +3,9 @@
 @section('title', 'List Kategori')
 @section('content-header', 'List Kategori')
 @section('content-actions')
+@hasanyrole('superadmin|inventory')
 <a href="{{route('categories.create')}}" class="btn btn-primary">Tambah Kategori</a>
+@endhasanyrole
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}">
@@ -20,7 +22,9 @@
                     <th>Nama Kategori</th>
                     <th>Tgl Dibuat</th>
                     <th>Tgl Diubah</th>
+                    @hasanyrole('superadmin|inventory')
                     <th>Aksi</th>
+                    @endhasanyrole
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +34,7 @@
                     <td>{{ $category->category_name }}</td>
                     <td>{{ $category->created_at }}</td>
                     <td>{{ $category->updated_at }}</td>
+                    @hasanyrole('superadmin|inventory')
                     <td>
                         <a href="{{ route('categories.edit', $category) }}" class="btn btn-primary"><i
                                 class="fas fa-edit"></i></a>
@@ -37,6 +42,7 @@
                             data-url="{{ route('categories.destroy', $category) }}"><i class="fas fa-trash"></i>
                         </button>
                     </td>
+                    @endhasanyrole
                 </tr>
                 @endforeach
             </tbody>
