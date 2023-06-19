@@ -273,6 +273,19 @@ class ProductController extends Controller
     
                 // Save the product
                 $product->save();
+
+                //import to prices_histories and stock_histories
+                $priceHistory = new PriceHistory();
+                $priceHistory->low_price = $product->low_price;
+                $priceHistory->stock_price = $product->stock_price;
+                $priceHistory->price = $product->price;
+                $priceHistory->fk_product_id = $product->id;
+                $priceHistory->save();
+                $stockHistory = new StockHistory();
+                $stockHistory->fk_product_id = $product->id;
+                $stockHistory->quantity = $product->quantity;
+                $stockHistory->created_at = now();
+                $stockHistory->save();
             }
     
             fclose($handle);
