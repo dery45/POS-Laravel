@@ -23,6 +23,13 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::resource('orders', OrderController::class)->only(['index', 'show']);
 });
 
+
+// Routes for admin with read-only access to products and categories
+Route::group(['middleware' => ['role:superadmin|admin']], function () {
+     // Home route
+     Route::get('/admin', [HomeController::class, 'index'])->name('home');
+});
+
 // Routes for superadmin and cashier
 Route::group(['middleware' => ['role:superadmin|cashier']], function () {
     // Cart routes
@@ -70,9 +77,6 @@ Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () 
 Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {
     // Autocomplete route
     Route::get('/autocomplete/search', 'AutocompleteController@search')->name('autocomplete.search');
-
-    // Home route
-    Route::get('/admin', [HomeController::class, 'index'])->name('home');
 });
 
 // Routes for superadmin, cashier, and inventory

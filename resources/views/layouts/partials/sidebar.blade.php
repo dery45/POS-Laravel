@@ -33,12 +33,14 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
                 <!-- Dashboard -->
+                @hasanyrole('superadmin|admin')
                 <li class="nav-item sidebar-item {{ 'admin' == request()->path() ? 'active' : '' }}" >
                     <a href="{{ route('home') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
+                @endhasanyrole
 
                 <!-- Categories -->
                 @hasanyrole('superadmin|admin|inventory')
