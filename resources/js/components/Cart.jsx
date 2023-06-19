@@ -27,6 +27,7 @@ class Cart extends Component {
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.loadCashData = this.loadCashData.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.loadCart = this.loadCart.bind(this);
         this.handleOnChangeBarcode = this.handleOnChangeBarcode.bind(this);
@@ -50,21 +51,23 @@ class Cart extends Component {
     }
 
     loadCashData() {
-        axios.get("/cart").then((res) => {
-            const cart = res.data;
-            this.setState({ cart });
-        });
-
-        axios.get("/cart").then((res) => {
-            const { capitalValue, cashIn, cashlessIn, pendapatan } = res.data;
+        axios.get("cart.index").then((res) => {
+          const cartData = res.data;
+          const { capitalValue, cashIn, cashlessIn, pendapatan } = cartData;
+      
+          axios.get("cart.index").then((res) => {
+            const updatedCartData = res.data;
+      
             this.setState({
-                capitalValue,
-                cashIn,
-                cashlessIn,
-                pendapatan,
+              cart: updatedCartData.cart,
+              capitalValue: capitalValue, // Update nilai capitalValue
+              cashIn,
+              cashlessIn,
+              pendapatan,
             });
+          });
         });
-    }
+      }
 
     loadCustomers() {
         axios.get(`/customers`).then((res) => {
@@ -77,7 +80,8 @@ class Cart extends Component {
         const query = !!search ? `?search=${search}` : "";
         axios.get(`/products${query}`).then((res) => {
             const products = res.data.data;
-            this.setState({ products });
+            const activeProducts = products.filter((product) => product.status === 1);
+            this.setState({ products: activeProducts });
         });
     }
 
