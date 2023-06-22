@@ -83,6 +83,15 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="orderQuantityChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
@@ -90,15 +99,18 @@
     <script>
     $(document).ready(function () {
         var incomeChart = null;
+        var orderQuantityChart = null;
 
         // Fetch data on page load
         fetchDataDashboardBox();
         fetchDataIncomeProfit();
+        fetchDataOrderQuantity();
 
         // Fetch data when the user selects a date
         $('#startDate, #endDate').change(function () {
             fetchDataDashboardBox();
             fetchDataIncomeProfit();
+            fetchDataOrderQuantity();
         });
 
         function fetchDataDashboardBox() {
@@ -185,14 +197,14 @@
               data: {
                   labels: labels,
                   datasets: [{
-                      label: 'Income',
+                      label: 'Pendapatan',
                       data: incomeValues,
                       backgroundColor: 'rgba(54, 162, 235, 0.2)',
                       borderColor: 'rgba(54, 162, 235, 1)',
                       fill: true,
                       lineTension: 0.3 // Adjust the tension here (0.1 to 0.5 recommended)
                   }, {
-                      label: 'Profit',
+                      label: 'Keuntungan',
                       data: profitValues,
                       backgroundColor: 'rgba(255, 99, 132, 0.2)',
                       borderColor: 'rgba(255, 99, 132, 1)',
@@ -206,6 +218,94 @@
               }
           });
       }
+       function fetchDataOrderQuantity() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var url = 'http://127.0.0.1:5551/order-quantity';
+
+                if (startDate && endDate) {
+                    url += '?start_date=' + startDate + '&end_date=' + endDate;
+                }
+
+                console.log('Fetching order-quantity data from API...');
+                console.log('URL:', url);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (response) {
+                        console.log('API response:', response);
+                        createOrUpdateOrderQuantityChart(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error fetching order-quantity data from API:', error);
+                        alert('Error fetching order-quantity data from API.');
+                    }
+                });
+            }
+
+            function createOrUpdateOrderQuantityChart(data) {
+                var labels = Object.keys(data);
+                var orderCountData = Object.values(data).map(item => parseInt(item.order_count));
+                var qtyCountData = Object.values(data).map(item => parseInt(item.qty_count));
+                var maxCount = Math.max(...orderCountData, ...qtyCountData);
+                var barColors = ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)'];
+
+                var ctx = document.getElementById('orderQuantityChart').getContext('2d');
+
+                if (orderQuantityChart) {
+                    orderQuantityChart.destroy();
+                }
+
+                orderQuantityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Jumlah Pesanan',
+                                data: orderCountData,
+                                backgroundColor: barColors[0],
+                                borderWidth: 0,
+                            },
+                            {
+                                label: 'Jumlah Barang',
+                                data: qtyCountData,
+                                backgroundColor: barColors[1],
+                                borderWidth: 0,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                grid: {
+                                    display: false,
+                                },
+                            },
+                            y: {
+                                stacked: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                },
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: Math.ceil(maxCount / 5),
+                                },
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                            },
+                        },
+                    },
+                });
+            }
     });
 </script>
 
