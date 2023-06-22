@@ -4,7 +4,7 @@ import webbrowser
 import time
 
 # Command 1
-directory1 = r"D:\Work Area\Project\XAMPP"
+directory1 = r"C:\xampp"
 command1 = 'xampp_start.exe'
 os.chdir(directory1)
 subprocess.call(command1, shell=True)
