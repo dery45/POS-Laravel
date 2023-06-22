@@ -3,7 +3,7 @@
 @section('title', 'Orders List')
 @section('content-header', 'Order List')
 @section('content-actions')
-    <!-- <a href="" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a> -->
+    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a>
 @endsection
 
 @section('content')
@@ -104,130 +104,125 @@
     </div>
 </div>
 
-<!-- Modal for Rekap Harian -->
+<!-- Daily Recap Modal -->
+
+<!-- Daily Recap Modal -->
 <div class="modal fade" id="rekapHarianModal" tabindex="-1" role="dialog" aria-labelledby="rekapHarianModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rekapHarianModalLabel">Rekap Harian</h5>
+                <h5 class="modal-title" id="rekapHarianModalLabel">Daily Recap</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('orders.list') }}" method="GET">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <label for="chooseDate">Choose Date</label>
-                            <input type="date" class="form-control" id="chooseDate" name="chosen_date">
-                        </div>
-                        <div class="col-md-5">
-                            <button class="btn btn-outline-primary" type="submit">Submit</button>
-                        </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Tanggal: <span id="rekapDate"></span></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h6>Modal: {{ config('settings.currency_symbol') }} <span id="rekapCapital"></span></h6>
+                    </div>
+                    <div class="col-6">
+                        <h6>Total Cash: {{ config('settings.currency_symbol') }} <span id="rekapTotalCash"></span></h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h6>Transaksi Cash: {{ config('settings.currency_symbol') }} <span id="rekapCashTransaction"></span></h6>
+                    </div>
+                    <div class="col-6">
+                        <h6>Transaksi Cashless: {{ config('settings.currency_symbol') }} <span id="rekapCashlessTransaction"></span></h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Total: {{ config('settings.currency_symbol') }} <span id="rekapTotal"></span></h6>
+                    </div>
+                </div>
+                <hr>
+                <form id="rekapHarianForm">
+                    <div class="form-group">
+                        <label for="dateInput">Date</label>
+                        <input type="date" class="form-control" id="dateInput" name="date">
                     </div>
                 </form>
-
-                
-                    
-                    <div class="form-group">
-                        <label for="modalHarian">Modal Harian</label>
-                        <input type="text" class="form-control" id="modalHarian">
-                    </div>
-                    <div class="form-group">
-                        <label for="totalCash">Total Cash</label>
-                        <input type="text" class="form-control" id="totalCash">
-                    </div>
-                    <div class="form-group">
-                        <label for="totalCashless">Total Cashless</label>
-                        <input type="text" class="form-control" id="totalCashless">
-                    </div>
-                    <div class="form-group">
-                        <label for="listTransaksi">List Transaksi</label>
-                        <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Nama Kasir</th>
-                            <th>Total</th>
-                            <th>Uang Diterima</th>
-                            <th>Kembalian</th>
-                            <th>Metode</th>
-                            <th>Tgl Transaksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($orders as $order)
-                        <tr>
-                            <td>{{ $order->id }}</td>
-                            <td>{{ $order->userName() }}</td>
-                            <td>{{ config('settings.currency_symbol') }} {{ $order->formattedTotal() }}</td>
-                            <td>{{ config('settings.currency_symbol') }} {{ $order->formattedReceivedAmount() }}</td>
-                            <td>{{ config('settings.currency_symbol') }} {{ number_format($order->total() - $order->receivedAmount(), 2) }}</td>
-                            <td>{{ $order->paymentMethod() }}</td>
-                            <td>{{ $order->created_at }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lihatBuktiCashless">Lihat Bukti Cashless</label>
-                        <input type="text" class="form-control" id="lihatBuktiCashless">
-                    </div>
-                </form>
+                <div id="rekapHarianResult"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="rekapHarianBtn">Get Recap</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Include jQuery library -->
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+
+<!-- Custom JavaScript code -->
 <script>
     $(document).ready(function() {
-        $(document).on('click', '.btn-delete', function () {
-    var $this = $(this);
+        // AJAX request for daily recap
+        $('#rekapHarianBtn').on('click', function() {
+            var date = $('#dateInput').val();
 
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-        },
-        buttonsStyling: false
-    });
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
 
-    swalWithBootstrapButtons.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Produk akan dihapus permanen!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
+            // Make an AJAX request to fetch the daily recap data
             $.ajax({
-                url: $this.data('url'),
-                type: 'POST',
-                data: {
-                    _method: 'DELETE',
-                    _token: '{{ csrf_token() }}'
+                url: 'http://127.0.0.1:5550/rekap/' + date,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Update the recap data in the modal
+                    $('#rekapDate').text(response.rekap.date);
+                    $('#rekapCapital').text(response.rekap.capital);
+                    $('#rekapTotalCash').text(response.rekap.total_cash);
+                    $('#rekapCashTransaction').text(response.rekap.cash_transaction);
+                    $('#rekapCashlessTransaction').text(response.rekap.cashless_transaction);
+                    $('#rekapTotal').text(response.rekap.total);
+
+                    // Build the HTML content for the recap data
+                    var html = '<h5> Detail: </h5>';
+                    html += '<table class="table">';
+                    html += '<thead><tr><th>Id</th><th>Nama Kasir</th><th>Total</th><th>Uang Diterima</th><th>Kembalian</th><th>Metode Pembayaran</th><th>Bukti Pembayaraan</th></tr></thead>';
+                    html += '<tbody>';
+
+                    // Loop through the detail objects and append rows to the table
+                    for (var key in response.detail) {
+                        var detail = response.detail[key];
+                        html += '<tr>';
+                        html += '<td>' + detail.id + '</td>';
+                        html += '<td>' + detail.operator + '</td>';
+                        html += '<td> {{ config('settings.currency_symbol') }} ' + detail.total + '</td>';
+                        html += '<td> {{ config('settings.currency_symbol') }} ' + detail.received_amount + '</td>';
+                        html += '<td> {{ config('settings.currency_symbol') }} ' + detail.change + '</td>';
+                        html += '<td>' + detail.method + '</td>';
+                        html += '<td>' + (detail.proof ? 'Ada' : 'Tidak Ada') + '</td>';
+                        html += '</tr>';
+                    }
+
+                    html += '</tbody>';
+                    html += '</table>';
+
+                    // Display the recap data in the modal
+                    $('#rekapHarianResult').html(html);
                 },
-                success: function (res) {
-                    $this.closest('tr').fadeOut(500, function () {
-                        $(this).remove();
-                    });
+                error: function(xhr, status, error) {
+                    console.log(error);
                 }
             });
-        }
-    });
-});
+        });
 
-
-        $('.btn-order-details').on('click', function() {
+        // AJAX request for order details
+        $(document).on('click', '.btn-order-details', function() {
             var orderId = $(this).data('order-id');
 
             // Make an AJAX request to fetch order details
@@ -244,75 +239,46 @@
                 }
             });
         });
-    });
 
-    $(document).ready(function() {
-    // Handle form submission
-    $('#rekapHarianForm').on('submit', function(e) {
-        e.preventDefault(); // Prevent form submission
+        // AJAX request for order deletion
+        $(document).on('click', '.btn-delete', function() {
+            var $this = $(this);
 
-        // Get form values
-        var chooseDate = $('#chooseDate').val();
-        var modalHarian = $('#modalHarian').val();
-        var totalCash = calculateTotalCash();
-        var totalCashless = calculateTotalCashless();
-        var listTransaksi = fetchOrderList(chooseDate);
-        var lihatBuktiCashless = "";
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            });
 
-        // Update the form fields with calculated values
-        $('#totalCash').val(totalCash);
-        $('#totalCashless').val(totalCashless);
-        $('#listTransaksi').val(listTransaksi);
-        $('#lihatBuktiCashless').val(lihatBuktiCashless);
-
-        // Close the modal
-        $('#rekapHarianModal').modal('hide');
-    });
-
-    // Calculate the total cash by summing up the cash payments and the daily capital
-    function calculateTotalCash() {
-        var cashPayments = parseFloat('{{ $orders->where("payment_method", "cash")->sum("receivedAmount") }}');
-        var dailyCapital = parseFloat($('#modalHarian').val());
-        var totalCash = cashPayments + dailyCapital;
-        return totalCash.toFixed(2);
-    }
-
-    // Calculate the total cashless by summing up the cashless payments
-    function calculateTotalCashless() {
-        var cashlessPayments = parseFloat('{{ $orders->where("payment_method", "cashless")->sum("receivedAmount") }}');
-        return cashlessPayments.toFixed(2);
-    }
-
-    // Fetch the order list for the chosen date
-    function fetchOrderList(date) {
-        // Make an AJAX request to fetch the order list
-        var orderList = [];
-        $.ajax({
-            url: '{{ route("orders.list") }}',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                date: date
-            },
-            async: false,
-            success: function(response) {
-                orderList = response;
-            },
-            error: function(xhr, status, error) {
-                console.log(error);
-            }
+            swalWithBootstrapButtons.fire({
+                title: 'Are you sure?',
+                text: 'The product will be permanently deleted!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $this.data('url'),
+                        type: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(res) {
+                            $this.closest('tr').fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                }
+            });
         });
-
-        // Format the order list as a string
-        var formattedOrderList = "";
-        for (var i = 0; i < orderList.length; i++) {
-            var order = orderList[i];
-            formattedOrderList += "ID: " + order.id + ", Nama Kasir: " + order.userName + ", Total: " + order.totalFormatted + "\n";
-        }
-
-        return formattedOrderList;
-    }
-});
-
+    });
 </script>
 @endsection
