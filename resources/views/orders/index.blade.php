@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Orders List')
-@section('content-header', 'Order List')
+@section('title', 'List Penjualan')
+@section('content-header', 'List Penjualan')
 @section('content-actions')
     <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#rekapHarianModal">Rekap Harian</a>
 @endsection
@@ -111,7 +111,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rekapHarianModalLabel">Daily Recap</h5>
+                <h5 class="modal-title" id="rekapHarianModalLabel">Rekap Harian</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -153,8 +153,8 @@
                 <div id="rekapHarianResult"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="rekapHarianBtn">Get Recap</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Keluar</button>
+                <button type="button" class="btn btn-primary" id="rekapHarianBtn">Tampilkan Rekap Harian</button>
             </div>
         </div>
     </div>
