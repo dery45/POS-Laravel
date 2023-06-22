@@ -5,33 +5,32 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-        <div class="col-3">
-          <div class="form-group">
-              <label for="startDate">Start Date:</label>
-              <div class="input-group">
-                  <input type="date" class="form-control" id="startDate" name="start_date">
-                  <div class="input-group-append">
-                      <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="col-3">
-          <div class="form-group">
-              <label for="endDate">End Date:</label>
-              <div class="input-group">
-                  <input type="date" class="form-control" id="endDate" name="end_date">
-                  <div class="input-group-append">
-                      <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                  </div>
-              </div>
-          </div>
-      </div>
-      </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label for="startDate">Tanggal Mulai:</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="startDate" name="start_date">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label for="endDate">Tanggal Akhir:</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="endDate" name="end_date">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-info">
+                <div class="small-box bg-info small-box-custom">
                     <div class="inner">
                         <h3 id="totalOrder" style="color: #fff;"></h3>
                         <p style="color: #fff;">Total Order</p>
@@ -41,10 +40,8 @@
                     </div>
                 </div>
             </div>
-            <!-- ./col -->
             <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-success">
+                <div class="small-box bg-success small-box-custom">
                     <div class="inner">
                         <h3 id="totalIncome" style="color: #fff;"></h3>
                         <p style="color: #fff;">Total Barang Terjual</p>
@@ -54,10 +51,8 @@
                     </div>
                 </div>
             </div>
-            <!-- ./col -->
             <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-danger">
+                <div class="small-box bg-danger small-box-custom">
                     <div class="inner">
                         <h3 id="incomeToday" style="color: #fff;"></h3>
                         <p style="color: #fff;">Total Pendapatan</p>
@@ -67,10 +62,8 @@
                     </div>
                 </div>
             </div>
-            <!-- ./col -->
             <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-warning">
+                <div class="small-box bg-warning small-box-custom">
                     <div class="inner">
                         <h3 id="totalCustomers" style="color: #fff;"></h3>
                         <p style="color: #fff;">Profit</p>
@@ -81,57 +74,147 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="incomeChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-     $(document).ready(function () {
-      // Fetch data on page load
-      fetchData($('#startDate').val(), $('#endDate').val());
+    $(document).ready(function () {
+        var incomeChart = null;
 
-      // Fetch data when the user selects a date
-      $('#startDate, #endDate').change(function () {
-          var startDate = $('#startDate').val();
-          var endDate = $('#endDate').val();
-          fetchData(startDate, endDate);
-      });
+        // Fetch data on page load
+        fetchDataDashboardBox();
+        fetchDataIncomeProfit();
 
-      // Fetch data from API and update boxes
-      function fetchData(startDate, endDate) {
-          var url = 'http://127.0.0.1:5551/dashboardbox';
+        // Fetch data when the user selects a date
+        $('#startDate, #endDate').change(function () {
+            fetchDataDashboardBox();
+            fetchDataIncomeProfit();
+        });
 
-          // Append start_date and end_date to the URL only if both values are present
-          if (startDate && endDate) {
-              url += '?start_date=' + startDate + '&end_date=' + endDate;
+        function fetchDataDashboardBox() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            var url = 'http://127.0.0.1:5551/dashboardbox';
+
+            if (startDate && endDate) {
+                url += '?start_date=' + startDate + '&end_date=' + endDate;
+            }
+
+            console.log('Fetching dashboard box data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    updateBoxes(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching dashboard box data from API:', error);
+                    alert('Error fetching dashboard box data from API.');
+                }
+            });
+        }
+
+        function fetchDataIncomeProfit() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            var url = 'http://127.0.0.1:5551/income-profit';
+
+            if (startDate && endDate) {
+                url += '?start_date=' + startDate + '&end_date=' + endDate;
+            }
+
+            console.log('Fetching income-profit data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    createOrUpdateChart(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching income-profit data from API:', error);
+                    alert('Error fetching income-profit data from API.');
+                }
+            });
+        }
+
+        function updateBoxes(data) {
+            var totalOrder = parseInt(data['Total Transaksi']);
+            var totalIncome = parseInt(data['Total Barang Terjual']);
+            var incomeToday = parseFloat(data['Total Pendapatan']);
+            var totalCustomers = parseFloat(data['Profit']);
+
+            $('#totalOrder').text(totalOrder);
+            $('#totalIncome').text(totalIncome);
+            $('#incomeToday').text(incomeToday.toFixed(2));
+            $('#totalCustomers').text(totalCustomers.toFixed(2));
+        }
+
+        function createOrUpdateChart(data) {
+          var labels = Object.keys(data);
+          var incomeValues = Object.values(data).map(function (item) {
+              return parseFloat(item.income);
+          });
+          var profitValues = Object.values(data).map(function (item) {
+              return parseFloat(item.profit);
+          });
+
+          var ctx = document.getElementById('incomeChart').getContext('2d');
+
+          if (incomeChart) {
+              incomeChart.destroy();
           }
 
-          console.log('Fetching data from API...');
-          console.log('URL:', url);
-
-          $.ajax({
-              url: url,
-              type: 'GET',
-              success: function (response) {
-                  console.log('API response:', response);
-                  // Convert string values to numbers
-                  var totalOrder = parseInt(response['Total Transaksi']);
-                  var totalIncome = parseFloat(response['Total Barang Terjual']);
-                  var incomeToday = parseFloat(response['Total Pendapatan']);
-                  var totalCustomers = parseFloat(response['Profit']);
-
-                  // Update the boxes with fetched data
-                  $('#totalOrder').text(totalOrder);
-                  $('#totalIncome').text(totalIncome.toFixed(2));
-                  $('#incomeToday').text(incomeToday.toFixed(2));
-                  $('#totalCustomers').text(totalCustomers.toFixed(2));
+          incomeChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: 'Income',
+                      data: incomeValues,
+                      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                      borderColor: 'rgba(54, 162, 235, 1)',
+                      fill: true,
+                      lineTension: 0.3 // Adjust the tension here (0.1 to 0.5 recommended)
+                  }, {
+                      label: 'Profit',
+                      data: profitValues,
+                      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                      borderColor: 'rgba(255, 99, 132, 1)',
+                      fill: true,
+                      lineTension: 0.3 // Adjust the tension here (0.1 to 0.5 recommended)
+                  }]
               },
-              error: function (xhr, status, error) {
-                  console.log('Error fetching data from API:', error);
-                  alert('Error fetching data from API.');
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false
               }
           });
       }
-  });
-    </script>
+    });
+</script>
+
+<style>
+    .small-box-custom {
+        height: 100px; /* Adjust the height as needed */
+        padding: 10px; /* Adjust the padding as needed */
+    }
+</style>
+
 
 @endsection
