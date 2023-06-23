@@ -1,6 +1,6 @@
 from flask import Flask, request, Response
 from flask_restful import Resource, Api
-from models import db, init_db, Capital, Order, OrderItem, Payment, User, Product
+from models import db, init_db, Capital, Order, OrderItem, Payment, User, Product, StockHistory, PriceHistory
 from flask_cors import CORS
 from sqlalchemy import func
 from decimal import Decimal
@@ -214,11 +214,88 @@ class PaymentStats(Resource):
 
         return data
 
+class StockHistoryResource(Resource):
+    def get(self, fk_product_id):
+        stock_history = StockHistory.query.filter_by(fk_product_id=fk_product_id).all()
+        results = []
+        previous_quantity = None
+        for record in stock_history:
+            if previous_quantity is None:
+                # For the first record, add it to the results
+                result = {
+                    'id': record.id,
+                    'fk_product_id': record.fk_product_id,
+                    'quantity': record.quantity,
+                    'created_at': str(record.created_at),
+                    'updated_at': str(record.updated_at)
+                }
+                results.append(result)
+                previous_quantity = record.quantity
+            else:
+                difference = record.quantity - previous_quantity
+                if difference != 0:
+                    # For subsequent records with a difference in quantity, add the difference to the results
+                    result = {
+                        'id': record.id,
+                        'fk_product_id': record.fk_product_id,
+                        'quantity': difference,
+                        'created_at': str(record.created_at),
+                        'updated_at': str(record.updated_at)
+                    }
+                    results.append(result)
+                    previous_quantity = record.quantity
+        return results
+
+class PriceHistoryResource(Resource):
+    def get(self, fk_product_id):
+        price_history = PriceHistory.query.filter_by(fk_product_id=fk_product_id).all()
+        results = []
+        previous_low_price = None
+        previous_stock_price = None
+        previous_price = None
+        for record in price_history:
+            if previous_low_price is None:
+                # For the first record, add it to the results
+                result = {
+                    'id': record.id,
+                    'low_price': str(record.low_price),
+                    'stock_price': str(record.stock_price),
+                    'price': str(record.price),
+                    'fk_product_id': record.fk_product_id,
+                    'created_at': str(record.created_at),
+                    'updated_at': str(record.updated_at)
+                }
+                results.append(result)
+                previous_low_price = record.low_price
+                previous_stock_price = record.stock_price
+                previous_price = record.price
+            else:
+                low_price_difference = record.low_price - previous_low_price
+                stock_price_difference = record.stock_price - previous_stock_price
+                price_difference = record.price - previous_price
+                if low_price_difference != 0 or stock_price_difference != 0 or price_difference != 0:
+                    # For subsequent records with a difference in any price field, add the differences to the results
+                    result = {
+                        'id': record.id,
+                        'low_price_difference': str(low_price_difference),
+                        'stock_price_difference': str(stock_price_difference),
+                        'price_difference': str(price_difference),
+                        'created_at': str(record.created_at),
+                        'updated_at': str(record.updated_at)
+                    }
+                    results.append(result)
+                    previous_low_price = record.low_price
+                    previous_stock_price = record.stock_price
+                    previous_price = record.price
+        return results
+
 api.add_resource(PaymentStats, '/payment-stats')
 api.add_resource(ProductQuantity, '/product-quantity')
 api.add_resource(OrderQuantityByDay, '/order-quantity')
 api.add_resource(IncomeProfitByDay, '/income-profit')
 api.add_resource(BoxValueResource, '/dashboardbox')
+api.add_resource(StockHistoryResource, '/stock_history/<int:fk_product_id>')
+api.add_resource(PriceHistoryResource, '/price_history/<int:fk_product_id>')
 
 if __name__ == '__main__':
     app.run()
