@@ -122,7 +122,19 @@ class Product(db.Model):
         self.stock_price = stock_price
         self.price = price
         self.quantity = quantity
+        
+class StockHistory(db.Model):
+    __tablename__ = 'stock_history'
 
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    fk_product_id = db.Column(db.BigInteger, db.ForeignKey('products.id'))
+    quantity = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, nullable=True, onupdate=db.func.current_timestamp())
+
+    def __init__(self, fk_product_id, quantity):
+        self.fk_product_id = fk_product_id
+        self.quantity = quantity
 
 def init_db(app):
     with app.app_context():
