@@ -216,7 +216,18 @@ class PaymentStats(Resource):
 
 class StockHistoryResource(Resource):
     def get(self, fk_product_id):
-        stock_history = StockHistory.query.filter_by(fk_product_id=fk_product_id).all()
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        stock_history_query = StockHistory.query.filter_by(fk_product_id=fk_product_id)
+
+        if start_date and end_date:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            stock_history_query = stock_history_query.filter(StockHistory.created_at >= start_datetime, StockHistory.created_at <= end_datetime)
+
+        stock_history = stock_history_query.all()
+
         results = []
         previous_quantity = None
         for record in stock_history:
@@ -244,11 +255,26 @@ class StockHistoryResource(Resource):
                     }
                     results.append(result)
                     previous_quantity = record.quantity
+
         return results
 
 class PriceHistoryResource(Resource):
     def get(self, fk_product_id):
-        price_history = PriceHistory.query.filter_by(fk_product_id=fk_product_id).all()
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        # Query the price history within the specified date range
+        if start_date and end_date:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            price_history = PriceHistory.query.filter(
+                PriceHistory.fk_product_id == fk_product_id,
+                PriceHistory.created_at >= start_datetime,
+                PriceHistory.created_at <= end_datetime
+            ).all()
+        else:
+            price_history = PriceHistory.query.filter_by(fk_product_id=fk_product_id).all()
+
         results = []
         previous_low_price = None
         previous_stock_price = None
