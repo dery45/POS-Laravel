@@ -92,6 +92,15 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="paymentStatsChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
@@ -105,12 +114,14 @@
         fetchDataDashboardBox();
         fetchDataIncomeProfit();
         fetchDataOrderQuantity();
+        fetchDataPaymentStats();
 
         // Fetch data when the user selects a date
         $('#startDate, #endDate').change(function () {
             fetchDataDashboardBox();
             fetchDataIncomeProfit();
             fetchDataOrderQuantity();
+            fetchDataPaymentStats();
         });
 
         function fetchDataDashboardBox() {
@@ -306,6 +317,85 @@
                     },
                 });
             }
+            function fetchDataPaymentStats() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var url = 'http://127.0.0.1:5551/payment-stats';
+
+                if (startDate && endDate) {
+                    url += '?start_date=' + startDate + '&end_date=' + endDate;
+                }
+
+                console.log('Fetching payment stats data from API...');
+                console.log('URL:', url);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (response) {
+                        console.log('API response:', response);
+                        createOrUpdatePaymentStatsChart(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error fetching payment stats data from API:', error);
+                        alert('Error fetching payment stats data from API.');
+                    }
+                });
+            }
+
+            function createOrUpdatePaymentStatsChart(data) {
+            var labels = Object.keys(data);
+            var values = Object.values(data).map(item => parseFloat(item.total));
+
+            var ctx = document.getElementById('paymentStatsChart').getContext('2d');
+            var paymentStatsChart = Chart.getChart(ctx);
+
+            if (paymentStatsChart) {
+                paymentStatsChart.data.labels = labels;
+                paymentStatsChart.data.datasets[0].data = values;
+                paymentStatsChart.update();
+            } else {
+                paymentStatsChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)'], // Adjust the colors as needed
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        var label = context.label || '';
+
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += parseFloat(context.parsed.toFixed(2)).toLocaleString('en-US');
+                                        label += ' (' + parseFloat(context.raw.percent.toFixed(2)).toLocaleString('en-US') + '%)';
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index', // Show tooltip for the nearest data item
+                            intersect: false,
+                        },
+                    }
+                });
+            }
+        }
     });
 </script>
 
