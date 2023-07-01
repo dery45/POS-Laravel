@@ -6,6 +6,7 @@ use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\StockHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -74,8 +75,17 @@ class OrderController extends Controller
         'amount' => $request->amount,
         'user_id' => $request->user()->id,
     ]);
-
     return 'success';
+    }
+
+    public function stockHistory(Request $request){
+        $stockHistory = new StockHistory();
+        foreach($request->items as $items){
+            $stockHistory->fk_product_id = $request->$items['fk_product_id'];
+            $stockHistory->quantity = $request->$items['quantity'];
+        }
+        $stockHistory->created_at = now();
+        $stockHistory->save();
     }
 
     public function details(Request $request)

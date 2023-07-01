@@ -28,6 +28,7 @@ class Cart extends Component {
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.loadCashData = this.loadCashData.bind(this);
+        this.postStock = this.postStock.bind(this),
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.loadCart = this.loadCart.bind(this);
         this.handleOnChangeBarcode = this.handleOnChangeBarcode.bind(this);
@@ -51,22 +52,12 @@ class Cart extends Component {
     }
 
     loadCashData() {
-        axios.get("cart.index").then((res) => {
+        axios.get('/cart').then((res) => {
           const cartData = res.data;
-          const { capitalValue, cashIn, cashlessIn, pendapatan } = cartData;
-      
-          axios.get("cart.index").then((res) => {
-            const updatedCartData = res.data;
-      
             this.setState({
-              cart: updatedCartData.cart,
-              capitalValue: capitalValue, // Update nilai capitalValue
-              cashIn,
-              cashlessIn,
-              pendapatan,
+              cartData
             });
           });
-        });
       }
 
     loadCustomers() {
@@ -278,7 +269,37 @@ class Cart extends Component {
         const paymentMethod = event.target.value;
         this.setState({ payment_method: paymentMethod });
     }
+    postStock() {
+        const { cart, products } = this.state;
+        let pid;
+        const requestData = cart.map((c) => {
+            pid=c.id;
+          const product = products.find((p) => p.id === c.id);
+          const qtynow = product.quantity;
+          const qtychange = qtynow - c.pivot.quantity;
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            barcode: product.barcode,
+            price: product.price,
+            quantity: qtychange,
+            status: product.status,
+            category_product: 1,
+            minimum_low: 0,
+            brand: c.brand,
+            low_price: c.low_price,
+            stock_price: c.stock_price,
+          };
+        });
+        console.log(requestData);
+        
+        const productId = requestData[0].id;
+        const url = `/products/${productId}`;
 
+        return axios.post(url, requestData[0]);
+      }
+            
 
     handleClickSubmit() {
         const { customer_id, cart, payment_method } = this.state;
@@ -313,6 +334,7 @@ class Cart extends Component {
               .post("/orders", requestData)
               .then((res) => {
                 console.log("Response Data:", res.data);
+                this.postStock();
                 this.loadCart();
                 this.loadProducts();
                 return res.data;
@@ -330,7 +352,7 @@ class Cart extends Component {
       }
     
     render() {
-        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashIn, cashlessIn, pendapatan } = this.state;
+        const { cart, products, customers, barcode,showModal,selectedProduct, capitalValue, cashIn, cashlessIn, pendapatan,cartData } = this.state;
         const totalAmount = this.getTotal(cart);
         return (
             
