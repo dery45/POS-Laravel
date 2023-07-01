@@ -78,16 +78,6 @@ class OrderController extends Controller
     return 'success';
     }
 
-    public function stockHistory(Request $request){
-        $stockHistory = new StockHistory();
-        foreach($request->items as $items){
-            $stockHistory->fk_product_id = $request->$items['fk_product_id'];
-            $stockHistory->quantity = $request->$items['quantity'];
-        }
-        $stockHistory->created_at = now();
-        $stockHistory->save();
-    }
-
     public function details(Request $request)
     {
         $orderId = $request->route('id');
