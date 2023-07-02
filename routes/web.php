@@ -62,21 +62,13 @@ Route::group(['middleware' => ['role:superadmin|inventory']], function () {
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
 
-    // Search route
-    Route::get('/search', 'SearchController@search')->name('search');
+   
 });
 
 // Routes for superadmin, admin, cashier, and inventory
 Route::group(['middleware' => ['role:superadmin|admin|inventory']], function () {
     // Category routes
     Route::resource('categories', CategoryController::class)->only(['index', 'show']);
-});
-
-
-// Routes for superadmin, admin, cashier, and inventory
-Route::group(['middleware' => ['role:superadmin|admin|cashier|inventory']], function () {
-    // Autocomplete route
-    Route::get('/autocomplete/search', 'AutocompleteController@search')->name('autocomplete.search');
 });
 
 // Routes for superadmin, cashier, and inventory
