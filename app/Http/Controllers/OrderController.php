@@ -6,6 +6,7 @@ use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\StockHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -74,8 +75,7 @@ class OrderController extends Controller
         'amount' => $request->amount,
         'user_id' => $request->user()->id,
     ]);
-
-    return 'success';
+    return response()->json(['order_id' => $order->id],200);
     }
 
     public function details(Request $request)

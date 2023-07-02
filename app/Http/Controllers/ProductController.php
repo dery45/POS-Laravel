@@ -204,7 +204,27 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Success, your product has been updated.');
     }
     
-
+    public function stockupdate(ProductUpdateRequest $request, Product $product){
+        $updatedData = [
+            'name' => $request->name,
+            'description' => $request->description,
+            'barcode' => $request->barcode,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
+            'status' => $request->status,
+            'category_product' => $request->category_product ?: null,
+            'minimum_low' => $request->minimum_low,
+            'brand' => $request->brand,
+            'low_price' => $request->low_price,
+            'stock_price' => $request->stock_price,
+        ];
+        $product->update($updatedData);
+        $stockHistory = new StockHistory();
+        $stockHistory->fk_product_id = $product->id;
+        $stockHistory->quantity = $product->quantity;
+        $stockHistory->created_at = now();
+        $stockHistory->save();
+    }
 
     /**
      * Remove the specified resource from storage.

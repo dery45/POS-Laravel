@@ -93,7 +93,6 @@ class CartController extends Controller
             }
             $request->user()->cart()->attach($product->id, ['quantity' => 1]);
         }
-
         return response('', 204);
     }
 
