@@ -23,6 +23,7 @@ class Cart extends Component {
             showModal: false,
             selectedProduct: null,
             minimumLowValue: 0,
+            orderId: null,
         };
         this.setPaymentMethod = this.setPaymentMethod.bind(this);
 
@@ -295,11 +296,32 @@ class Cart extends Component {
         console.log(requestData);
         
         const productId = requestData[0].id;
-        const url = `/products/${productId}`;
+        const url = `/products/history/${productId}`;
 
         return axios.post(url, requestData[0]);
       }
             
+
+    handlePrintModal(orderId){
+        Swal.fire({
+            title: "Cetak nota?",
+            showCancelButton: true,
+            cancelButtonText: "Batal",
+            confirmButtonText: "Cetak",
+            showLoaderOnConfirm: true,
+        }).then((result) => {
+            console.log(orderId);
+            if(result.isConfirmed){
+                const printUrl = `/orders/${orderId}/print`;
+                axios.get(printUrl)
+                .then((res) => {
+                    Swal.fire('Success', 'Nota tercetak.','success');
+                }).catch((err) => {
+                    Swal.fire('Error', 'Nota gagal dicetak.','error');
+                })
+            }
+        });
+    }
 
     handleClickSubmit() {
         const { customer_id, cart, payment_method } = this.state;
@@ -333,10 +355,31 @@ class Cart extends Component {
             return axios
               .post("/orders", requestData)
               .then((res) => {
+                const orderId = res.data.order_id;
+                console.log("orderid", orderId);
                 console.log("Response Data:", res.data);
                 this.postStock();
                 this.loadCart();
                 this.loadProducts();
+
+                Swal.fire({
+                    title: "Cetak nota?",
+                    showCancelButton: true,
+                    cancelButtonText: "Batal",
+                    confirmButtonText: "Cetak",
+                }).then((result) => {
+                    /*console.log(orderId);
+                    if(result.isConfirmed){
+                        const printUrl = `/orders/${orderId}/print`;
+                        axios.get(printUrl)
+                        .then((res) => {
+                            Swal.fire('Success', 'Nota tercetak.','success');
+                        }).catch((err) => {
+                            Swal.fire('Error', 'Nota gagal dicetak.','error');
+                        })
+                    }*/
+                });
+
                 return res.data;
               })
               .catch((err) => {
@@ -346,7 +389,13 @@ class Cart extends Component {
           allowOutsideClick: () => !Swal.isLoading(),
         }).then((result) => {
           if (result.value) {
-            // Handle success case
+            Swal.fire({
+                title: "Transaksi tersimpan",
+                icon: 'success',
+                timer: 800,
+                showCancelButton: false,
+                showConfirmButton: false
+            })
           }
         });
       }

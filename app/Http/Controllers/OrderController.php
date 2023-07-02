@@ -75,7 +75,7 @@ class OrderController extends Controller
         'amount' => $request->amount,
         'user_id' => $request->user()->id,
     ]);
-    return 'success';
+    return response()->json(['order_id' => $order->id],200);
     }
 
     public function details(Request $request)

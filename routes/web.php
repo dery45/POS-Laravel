@@ -50,7 +50,7 @@ Route::group(['middleware' => ['role:superadmin|admin|cashier']], function () {
     Route::post('/orders/{id}/upload-proof', [OrderController::class, 'uploadProof'])->name('orders.uploadProof');
     Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
     //product route
-    Route::post('/products/{product}', [ProductController::class, 'stockupdate'])->name('products.update');
+    Route::post('/products/history/{product}', [ProductController::class, 'stockupdate'])->name('products.update');
 });
 
 // Routes for superadmin and inventory
