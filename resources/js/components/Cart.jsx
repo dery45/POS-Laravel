@@ -270,36 +270,6 @@ class Cart extends Component {
         const paymentMethod = event.target.value;
         this.setState({ payment_method: paymentMethod });
     }
-    /*postStock() {
-        const { cart, products } = this.state;
-        let pid;
-        const requestData = cart.map((c) => {
-            pid=c.id;
-          const product = products.find((p) => p.id === c.id);
-          const qtynow = product.quantity;
-          const qtychange = qtynow - c.pivot.quantity;
-          return {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            barcode: product.barcode,
-            price: product.price,
-            quantity: qtychange,
-            status: product.status,
-            category_product: 1,
-            minimum_low: 0,
-            brand: c.brand,
-            low_price: c.low_price,
-            stock_price: c.stock_price,
-          };
-        });
-        console.log(requestData);
-        
-        const productId = requestData[0].id;
-        const url = `/products/history/${productId}`;
-
-        return axios.post(url, requestData[0]);
-      }*/
     
       postStock() {
         const { cart, products } = this.state;
