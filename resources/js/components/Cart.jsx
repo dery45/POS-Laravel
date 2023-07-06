@@ -327,6 +327,7 @@ class Cart extends Component {
     handleClickSubmit() {
         const { customer_id, cart, payment_method } = this.state;
         const totalAmount = this.getTotal(this.state.cart);
+        let orderId;
       
         Swal.fire({
           title: "Uang Diterima",
@@ -356,30 +357,14 @@ class Cart extends Component {
             return axios
               .post("/orders", requestData)
               .then((res) => {
-                const orderId = res.data.order_id;
+                orderId = res.data.order_id;
                 console.log("orderid", orderId);
                 console.log("Response Data:", res.data);
                 this.loadCart();
                 this.loadProducts();
                 this.postStock();
 
-                Swal.fire({
-                    title: "Cetak nota?",
-                    showCancelButton: true,
-                    cancelButtonText: "Batal",
-                    confirmButtonText: "Cetak",
-                }).then((result) => {
-                    /*console.log(orderId);
-                    if(result.isConfirmed){
-                        const printUrl = `/orders/${orderId}/print`;
-                        axios.get(printUrl)
-                        .then((res) => {
-                            Swal.fire('Success', 'Nota tercetak.','success');
-                        }).catch((err) => {
-                            Swal.fire('Error', 'Nota gagal dicetak.','error');
-                        })
-                    }*/
-                });
+                
 
                 return res.data;
               })
@@ -391,11 +376,26 @@ class Cart extends Component {
         }).then((result) => {
           if (result.value) {
             Swal.fire({
-                title: "Transaksi tersimpan",
-                icon: 'success',
-                timer: 800,
-                showCancelButton: false,
-                showConfirmButton: false
+                title: "Cetak Nota?",
+                //icon: 'success',
+                //timer: 800,
+                showCancelButton: true,
+                showConfirmButton: true
+            })
+            .then((result)=>{
+                if (result.isConfirmed){
+                    Swal.fire({
+                        title: "Transaksi Selesai",
+                        icon: 'success',
+                        timer: 800,
+                        showCancelButton: false,
+                        showConfirmButton: false
+                    })
+                    console.log("orderisbawah:",orderId);
+                    const printUrl = `/orders/${orderId}/print`;
+                    axios.get(printUrl)
+                    
+                }
             })
           }
         });
