@@ -270,7 +270,7 @@ class Cart extends Component {
         const paymentMethod = event.target.value;
         this.setState({ payment_method: paymentMethod });
     }
-    postStock() {
+    /*postStock() {
         const { cart, products } = this.state;
         let pid;
         const requestData = cart.map((c) => {
@@ -299,8 +299,39 @@ class Cart extends Component {
         const url = `/products/history/${productId}`;
 
         return axios.post(url, requestData[0]);
+      }*/
+    
+      postStock() {
+        const { cart, products } = this.state;
+        const requests = [];
+      
+        cart.forEach((c) => {
+          const product = products.find((p) => p.id === c.id);
+          const qtynow = product.quantity;
+          const qtychange = qtynow - c.pivot.quantity;
+      
+          const requestData = {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            barcode: product.barcode,
+            price: product.price,
+            quantity: qtychange,
+            status: product.status,
+            category_product: 1,
+            minimum_low: 0,
+            brand: c.brand,
+            low_price: c.low_price,
+            stock_price: c.stock_price,
+          };
+      
+          const url = `/products/history/${requestData.id}`;
+          const request = axios.post(url, requestData);
+          requests.push(request);
+        });
+      
+        return Promise.all(requests);
       }
-            
 
     handlePrintModal(orderId){
         Swal.fire({
@@ -358,9 +389,9 @@ class Cart extends Component {
                 const orderId = res.data.order_id;
                 console.log("orderid", orderId);
                 console.log("Response Data:", res.data);
-                this.postStock();
                 this.loadCart();
                 this.loadProducts();
+                this.postStock();
 
                 Swal.fire({
                     title: "Cetak nota?",
