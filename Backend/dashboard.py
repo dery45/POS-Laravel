@@ -315,6 +315,16 @@ class PriceHistoryResource(Resource):
                     previous_price = record.price
         return results
 
+class ProductList(Resource):
+    def get(self):
+        # Query the Product table to get the id and name fields
+        products = Product.query.with_entities(Product.id, Product.name).all()
+
+        # Convert the result to a list of dictionaries
+        data = [{'id': product.id, 'name': product.name} for product in products]
+
+        return data
+
 api.add_resource(PaymentStats, '/payment-stats')
 api.add_resource(ProductQuantity, '/product-quantity')
 api.add_resource(OrderQuantityByDay, '/order-quantity')
@@ -322,6 +332,7 @@ api.add_resource(IncomeProfitByDay, '/income-profit')
 api.add_resource(BoxValueResource, '/dashboardbox')
 api.add_resource(StockHistoryResource, '/stock_history/<int:fk_product_id>')
 api.add_resource(PriceHistoryResource, '/price_history/<int:fk_product_id>')
+api.add_resource(ProductList, '/products')
 
 if __name__ == '__main__':
     app.run()
