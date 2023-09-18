@@ -14,8 +14,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
+
 class ProductController extends Controller
 {
+    public function homeIndex()
+    {
+        $products = Product::all();
+
+        return view('home', ['products' => $products]);
+    }
     /**
      * Display a listing of the resource.
      *

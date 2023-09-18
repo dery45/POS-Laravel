@@ -100,6 +100,38 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="topProductsTable" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="productId">Product:</label>
+                            <select class="form-control" id="productId" name="product_id">
+                                @foreach ($products ?? [] as $product)
+                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <canvas id="stockHistoryChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -109,12 +141,16 @@
     $(document).ready(function () {
         var incomeChart = null;
         var orderQuantityChart = null;
+        var stockHistoryChart = null;
+        var selectedProductId = null;
 
         // Fetch data on page load
         fetchDataDashboardBox();
         fetchDataIncomeProfit();
         fetchDataOrderQuantity();
         fetchDataPaymentStats();
+        fetchTopProducts();
+        fetchStockHistory();
 
         // Fetch data when the user selects a date
         $('#startDate, #endDate').change(function () {
@@ -122,6 +158,13 @@
             fetchDataIncomeProfit();
             fetchDataOrderQuantity();
             fetchDataPaymentStats();
+            fetchTopProducts();
+            fetchStockHistory();
+        });
+
+          // Fetch data when the user selects a product
+        $('#productId').change(function () {
+            fetchStockHistory();
         });
 
         function fetchDataDashboardBox() {
@@ -350,6 +393,7 @@
             function createOrUpdatePaymentStatsChart(data) {
             var labels = Object.keys(data);
             var values = Object.values(data).map(item => parseFloat(item.total));
+            var percentages = Object.values(data).map(item => parseFloat(item.percent));
 
             var ctx = document.getElementById('paymentStatsChart').getContext('2d');
             var paymentStatsChart = Chart.getChart(ctx);
@@ -357,6 +401,7 @@
             if (paymentStatsChart) {
                 paymentStatsChart.data.labels = labels;
                 paymentStatsChart.data.datasets[0].data = values;
+                paymentStatsChart.data.datasets[0].percentages = percentages;
                 paymentStatsChart.update();
             } else {
                 paymentStatsChart = new Chart(ctx, {
@@ -365,6 +410,7 @@
                         labels: labels,
                         datasets: [{
                             data: values,
+                            percentages: percentages,
                             backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)'], // Adjust the colors as needed
                             borderWidth: 0
                         }]
@@ -381,12 +427,14 @@
                                 callbacks: {
                                     label: function (context) {
                                         var label = context.label || '';
+                                        var value = parseFloat(context.parsed.toFixed(2)).toLocaleString('en-US');
+                                        var percentage = parseFloat(context.dataset.percentages[context.dataIndex].toFixed(2)).toLocaleString('en-US');
 
                                         if (label) {
-                                            label += ': ';
+                                            label += ':\n';
                                         }
-                                        label += parseFloat(context.parsed.toFixed(2)).toLocaleString('en-US');
-                                        label += ' (' + parseFloat(context.raw.percent.toFixed(2)).toLocaleString('en-US') + '%)';
+                                        label += 'Jumlah: ' + value + '\n';
+                                        label += 'Persentase: ' + percentage + '%';
                                         return label;
                                     }
                                 }
@@ -399,6 +447,171 @@
                     }
                 });
             }
+        }
+        function fetchTopProducts() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            var url = 'http://127.0.0.1:5551/product-quantity';
+
+            if (startDate && endDate) {
+                url += '?start_date=' + startDate + '&end_date=' + endDate;
+            }
+
+            console.log('Fetching top products data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    updateTopProductsTable(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching top products data from API:', error);
+                    alert('Error fetching top products data from API.');
+                }
+            });
+        }
+
+        function createOrUpdateTopProductsChart(data) {
+            var labels = Object.keys(data);
+            var quantityValues = Object.values(data).map(function (item) {
+                return parseInt(item.qty_count);
+            });
+
+            var ctx = document.getElementById('topProductsChart').getContext('2d');
+
+            if (topProductsChart) {
+                topProductsChart.destroy();
+            }
+
+            topProductsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: quantityValues,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    var label = context.label || '';
+                                    var value = parseFloat(context.parsed.toFixed(2)).toLocaleString('en-US');
+
+                                    if (label) {
+                                        label += ':\n';
+                                    }
+                                    label += 'Quantity: ' + value;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTopProductsTable(data) {
+            var tableBody = $('#topProductsTable tbody');
+            tableBody.empty();
+
+            Object.entries(data).forEach(([product, values]) => {
+                var row = $('<tr></tr>');
+                var productCell = $('<td></td>').text(product);
+                var quantityCell = $('<td></td>').text(parseInt(values.qty_count));
+
+                row.append(productCell, quantityCell);
+                tableBody.append(row);
+            });
+        }
+        function fetchStockHistory() {
+            var productId = $('#productId').val();
+            var url = 'http://127.0.0.1:5551/stock_history/' + productId;
+
+            console.log('Fetching stock history data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    createOrUpdateStockHistoryChart(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching stock history data from API:', error);
+                    alert('Error fetching stock history data from API.');
+                }
+            });
+        }
+
+        function createOrUpdateStockHistoryChart(data) {
+            var labels = data.map(function (item) {
+                return item.created_at;
+            });
+            var quantityValues = data.map(function (item) {
+                return parseInt(item.quantity);
+            });
+
+            var ctx = document.getElementById('stockHistoryChart').getContext('2d');
+
+            if (stockHistoryChart) {
+                stockHistoryChart.destroy();
+            }
+
+            stockHistoryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantity',
+                        data: quantityValues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)', // Adjust the color as needed
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false,
+                            },
+                        },
+                        y: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+            });
         }
     });
 </script>
