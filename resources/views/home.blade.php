@@ -117,22 +117,29 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="productId">Product:</label>
-                            <select class="form-control" id="productId" name="product_id">
-                                @foreach ($products ?? [] as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                    <label for="productId">Product:</label>
+                                    <select class="form-control" id="productId" name="product_id">
+                                        <option value="">Select a product</option> <!-- Add an empty option -->
+                                    </select>
+                            </div>
                         </div>
-                        <canvas id="stockHistoryChart" width="400" height="250"></canvas>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <canvas id="stockHistoryChart" width="400" style="max-height: 250px;"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <canvas id="priceHistoryChart" width="400" style="max-height: 250px;"></canvas>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>    
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
@@ -142,6 +149,7 @@
         var incomeChart = null;
         var orderQuantityChart = null;
         var stockHistoryChart = null;
+        var priceHistoryChart = null;
         var selectedProductId = null;
 
         // Fetch data on page load
@@ -151,6 +159,7 @@
         fetchDataPaymentStats();
         fetchTopProducts();
         fetchStockHistory();
+        fetchProductList();
 
         // Fetch data when the user selects a date
         $('#startDate, #endDate').change(function () {
@@ -160,11 +169,13 @@
             fetchDataPaymentStats();
             fetchTopProducts();
             fetchStockHistory();
+            fetchPriceHistory();
         });
 
           // Fetch data when the user selects a product
         $('#productId').change(function () {
             fetchStockHistory();
+            fetchPriceHistory();
         });
 
         function fetchDataDashboardBox() {
@@ -610,6 +621,197 @@
                             display: false,
                         },
                     },
+                },
+            });
+        }
+
+        // Function to fetch stock history data
+        function fetchStockHistory() {
+            var productId = $('#productId').val();
+            var url = 'http://127.0.0.1:5551/stock_history/' + productId;
+
+            console.log('Fetching stock history data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    createOrUpdateStockHistoryChart(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching stock history data from API:', error);
+                    alert('Error fetching stock history data from API.');
+                }
+            });
+        }
+
+        // Function to create or update the stock history chart
+        function createOrUpdateStockHistoryChart(data) {
+            var labels = data.map(function (item) {
+                return item.created_at;
+            });
+            var quantityValues = data.map(function (item) {
+                return parseInt(item.quantity);
+            });
+
+            var ctx = document.getElementById('stockHistoryChart').getContext('2d');
+
+            if (stockHistoryChart) {
+                stockHistoryChart.destroy();
+            }
+
+            stockHistoryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantity',
+                        data: quantityValues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)', // Adjust the color as needed
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false,
+                            },
+                        },
+                        y: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+            });
+        }
+
+        // Function to fetch the product list
+        function fetchProductList() {
+            var url = 'http://127.0.0.1:5551/products';
+
+            console.log('Fetching product list from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (products) {
+                    console.log('API response:', products);
+
+                    // Clear existing options in the dropdown
+                    $('#productId').empty();
+
+                    // Add the empty option again
+                    $('#productId').append($('<option>', {
+                        value: '',
+                        text: 'Select a product'
+                    }));
+
+                    // Populate the dropdown with product data
+                    products.forEach(function (product) {
+                        $('#productId').append($('<option>', {
+                            value: product.id,
+                            text: product.name
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching product list from API:', error);
+                    alert('Error fetching product list from API.');
+                }
+            });
+        }
+         // Function to fetch price history data
+         function fetchPriceHistory() {
+            var productId = $('#productId').val();
+            var url = 'http://127.0.0.1:5551/price_history/' + productId;
+
+            console.log('Fetching price history data from API...');
+            console.log('URL:', url);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    console.log('API response:', response);
+                    createOrUpdatePriceHistoryChart(response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error fetching price history data from API:', error);
+                    alert('Error fetching price history data from API.');
+                }
+            });
+        }
+
+        // Function to create or update the price history chart
+        function createOrUpdatePriceHistoryChart(data) {
+            var labels = data.map(function (item) {
+                return item.created_at;
+            });
+            var lowPriceDifferenceValues = data.map(function (item) {
+                return parseFloat(item.low_price_difference);
+            });
+            var stockPriceDifferenceValues = data.map(function (item) {
+                return parseFloat(item.stock_price_difference);
+            });
+            var priceDifferenceValues = data.map(function (item) {
+                return parseFloat(item.price_difference);
+            });
+
+            var ctx = document.getElementById('priceHistoryChart').getContext('2d');
+
+            if (priceHistoryChart) {
+                priceHistoryChart.destroy();
+            }
+
+            priceHistoryChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Low Price Difference',
+                            data: lowPriceDifferenceValues,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            fill: false,
+                            lineTension: 0.3,
+                        },
+                        {
+                            label: 'Stock Price Difference',
+                            data: stockPriceDifferenceValues,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            fill: false,
+                            lineTension: 0.3,
+                        },
+                        {
+                            label: 'Price Difference',
+                            data: priceDifferenceValues,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            fill: false,
+                            lineTension: 0.3,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                 },
             });
         }
